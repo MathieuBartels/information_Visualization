@@ -1,12 +1,53 @@
 import csv
 from collections import defaultdict
 
-class NOWHERE:
-    def __init__(self, filename = "NOWHERE_DATASET"):
+class NOWHERE():
+    '''
+    This class contains many different dictionaries for easy data acces from the NOWHERE dataset.
+    ----------
+    Attributes
+    ----------
+    year : dict
+        maps from an image name to the year in which the image is taken
+
+    geography: dict
+        maps from the image name to the continent where the image was taken
+
+    reality: defaultdict(dict)
+        maps from the image name to the reality subsections and from each subsection it maps to the value
+
+    human_factor: defaultdict(dict)
+        maps from the image name to the human_factor subsections and from each subsection it maps to the value
+
+    domains: defaultdict(dict)
+        maps from the image name to the domains subsections and from each subsection it maps to the value
+    
+    goals: defaultdict(dict)
+        maps from the image name to the goals subsections and from each subsection it maps to the corresponding value
+
+    means: defaultdict(dict)
+        maps from the image name to the means subsections and from each subsection it maps to the corresponding value
+    
+    my_approach: defaultdict(dict)
+        maps from the image name to the my_approach subsections and from each subsection it maps to the corresponding value
+    
+    conent_to_me: defaultdict(dict)
+        maps from the image name to the content_to_me subsections and from each subsection it maps to the corresponding value
+
+    naming_convention: dict
+        maps from the image name to the corresponding integer indicated in the NOWHERE_naming_convention
+    '''
+    def __init__(self, filename = "NOWHERE_DATASET", naming_convention = "NOWHERE_Naming_Convention"):
         with open(f'{filename}.csv', 'r') as f:
             reader = csv.reader(f)
             csv_per_line = list(reader)
+
+        with open(f'{naming_convention}.csv', 'r') as g:
+            name_reader = csv.reader(g)
+            name_csv_per_line = list(name_reader)
+
         self.dataset = csv_per_line
+        self.naming_convention_csv = name_csv_per_line
 
         self.year = {}
         self.geography = {}
@@ -18,8 +59,15 @@ class NOWHERE:
         self.my_approach = defaultdict(dict)
         self.content_to_me = defaultdict(dict)
 
+        self.naming_convention = {}
+
         print("Initializing done")
+        self.fill_naming_convention()
         self.fill_dicts()
+
+    def fill_naming_convention(self):
+        for i in self.naming_convention_csv:
+            self.naming_convention[i[1]] = i[0]
 
     def fill_dicts(self):
         countries_l = []
@@ -97,10 +145,8 @@ class NOWHERE:
                             self.content_to_me[i[0]][ri] = float(i[column_val + 115])
                         except:
                             continue
-            
-        print("Dictionaries filled")
         
+        print("Dictionaries filled")
 
 h = NOWHERE()
-
-        
+h
