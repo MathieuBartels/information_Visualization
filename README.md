@@ -1,6 +1,9 @@
-# information_visualization
+# IV Project - NOWHERE
 
-### Weekly Meeting 1
-1. Show progress
-2. Plan for next week
-3. Ask questions we need to solve
+## Code structure
+
+- App is the root of the application.
+- Data folder holds the csv files.
+- Template folder stores the layout of the project (probably TBE with js)
+- Utils folder stores any script we may need as a helper module.
+- run.sh fires up the web server
