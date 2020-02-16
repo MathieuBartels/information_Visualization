@@ -1,0 +1,9 @@
+.circle {
+	fill: steelblue;
+	cursor: crosshair;
+}
+
+.bar:hover {
+	fill: DarkOrange;
+	cursor: crosshair;
+}
