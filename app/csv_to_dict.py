@@ -1,19 +1,8 @@
 import csv
+import os
 from collections import defaultdict
 
-from pathlib import Path, PureWindowsPath
-
-filename = Path("~/data/NOWHERE_DATASET.csv")
-
-filename2 = Path("~/data/NOWHERE_Naming_Convention.csv")
-
-# Convert path to Windows format
-path_on_windows_1 = PureWindowsPath(filename)
-path_on_windows_2 = PureWindowsPath(filename2)
-
-# print(path_on_windows)
-filename_dataset = path_on_windows_1
-filename_convention = path_on_windows_2
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 class NOWHERE():
     '''
@@ -51,22 +40,14 @@ class NOWHERE():
     naming_convention: dict
         maps from the image name to the corresponding integer indicated in the NOWHERE_naming_convention
     '''
-    def __init__(self, filename = filename_dataset, naming_convention = filename_convention):
-        with open(f'{filename}', 'r') as f:
+    def __init__(self, filename = f"{basedir}\\NOWHERE_DATASET", naming_convention = f"{basedir}\\NOWHERE_Naming_Convention"):
+        with open(f'{filename}.csv', 'r') as f:
             reader = csv.reader(f)
             csv_per_line = list(reader)
 
-        with open(f'{naming_convention}', 'r') as g:
+        with open(f'{naming_convention}.csv', 'r') as g:
             name_reader = csv.reader(g)
             name_csv_per_line = list(name_reader)
-    # def __init__(self, filename = "NOWHERE_DATASET", naming_convention = "NOWHERE_Naming_Convention"):
-        # with open(f'{filename}.csv', 'r') as f:
-        #     reader = csv.reader(f)
-        #     csv_per_line = list(reader)
-
-        # with open(f'{naming_convention}.csv', 'r') as g:
-        #     name_reader = csv.reader(g)
-        #     name_csv_per_line = list(name_reader)
 
         self.dataset = csv_per_line
         self.naming_convention_csv = name_csv_per_line

@@ -30,6 +30,6 @@ def view2():
 @app.route('/view3')
 def index():
 	data = csv_to_dict.h
-	images = ["Bloom_2006.jpg", "Annex_2013.jpg"]
+	images = ["Bloom_2006", "Annex_2013"]
 	user = {'username': 'Pepijn', 'im':'Selected Image'}
 	return render_template('view3.html', user=user, images=images, data=data)
