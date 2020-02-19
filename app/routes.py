@@ -18,8 +18,5 @@ def home():
 
 @app.route("/view2")
 def view2():
-	output_file('view2.html')
-	plot = images.show_img()
-	jsonify(plotData=plot)
-	return render_template('view2.html')
-	# return jsonify(plotData=plot)
+	# output_file('view2.html')
+	return render_template('view2.html', title='this is view2')
