@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}  - NOWHERE {% endblock %}
+{% block body %}
+
+<div id="view3" class="view3_2"></div>
+<h1>Hello, {{ user.username }}!</h1>
+<h2>Your selected image is : {{ user.im }}!</h>
+    <hr>
+    {% for im in images %}
+    <p>
+    {{ im }}
+    </p>
+    {% endfor %}
+    <hr>
+    <p>{{data.year['CH-1995-1']}}</p>
+{% endblock %}
