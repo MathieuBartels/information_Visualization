@@ -1,24 +1,23 @@
 import os, json
 
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, send_from_directory
+
 from bokeh.plotting import output_file, figure
-# from bokeh.io import curdoc
 from bokeh.embed import components
 from bokeh.layouts import gridplot
+from bokeh.models import ColumnDataSource, Range1d
 
 from app import app
 from app import image_plotting
-from app.utils import csv_to_dict
+from app.utils.csv_to_dict import nowhere_metadata
 from decimal import Decimal
 import pandas as pd
 import numpy as np
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template('home.html', title='Welcome!')
+	return render_template('home.html', title='Welcome!')
 
 @app.route("/view2", methods = ['GET', 'POST'])
 def view2():
@@ -27,19 +26,35 @@ def view2():
 
 @app.route('/view3', methods = ['GET', 'POST'])
 def index():
-	data = csv_to_dict.h
-	images = ["Bloom_2006", "Annex_2013"]
+	data = nowhere_metadata
+
+	images = os.listdir('app/static/230_works_1024x/')
+	urls = [f'/static/230_works_1024x/{image}' for image in images]
+	names = [image[:-4] for image in images]
+	image_to_source = {name : [source] for name, source in zip(names, urls)}
+
 	user = {'username': 'Pepijn', 'im':'Selected Image'}
-	
-	# TODO make the base url working, the direction is right, but no idea why it doesn't show
-	url = f"{basedir}\\data\\230_works_1024x\\13aeroplanes_1998.jpg"
-	url_2 = "https://github.com/MathieuBartels/information_visualization/blob/master/app/data/230_works_1024x/13aeroplanes_1998.jpg?raw=true"
-	
-	p = figure(plot_width=300, plot_height=300,toolbar_location=None)
-	# p.image_url(url=[url01], x=0, y=100, w=50, h=50)
-	p.image_url(url=[url_2], x=0, y=200, w=50, h=50)
+
+	data_source = ColumnDataSource(image_to_source)
+
+	image_selection = names # TODO make this selection more fancy and maybe dynamic
+	N = min(len(image_selection), 15)
+	xr = 10
+	yr = 10
+	x1 = np.linspace(0, xr, N+1)
+	y1 = np.linspace(0, yr, N+1)
+
+	#Greate figure
+	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=300, plot_height=500,toolbar_location=None)
+	for i, url in enumerate(image_selection):
+		p.image_url(url=url, x=x1[i % 15], y=i//15, w=xr/N, h=yr/N, source=data_source)
+
+	#Remove grid and axis
+	p.xgrid.visible = False
+	p.ygrid.visible = False
 	p.axis.visible = False
 	p.xgrid.grid_line_color = None
+	
 
 	# script, div = components(p)
 
@@ -57,10 +72,16 @@ def index():
 	r_square.xgrid.grid_line_color = None
 
 	# the layout is a grid: square -- image -- square
-	grid = gridplot([[l_square, p, r_square]], plot_width=400, plot_height=400)
+	grid = gridplot([[l_square, p, r_square]], plot_width=400, plot_height=600)
 
 	# define the components: the javascript used and the div
 	l_square_script, l_square_div = components(grid)
 	
 	return render_template('view3.html',
 		user=user, images=images, data=data, l_square_script=l_square_script, l_square_div=l_square_div)
+
+
+@app.route('/favicon.ico')
+def favicon():
+	return send_from_directory(os.path.join(app.root_path, 'static'),
+										'favicon.ico', mimetype='image/vnd.microsoft.icon')

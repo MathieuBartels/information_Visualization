@@ -40,7 +40,7 @@ class NOWHERE():
     naming_convention: dict
         maps from the image name to the corresponding integer indicated in the NOWHERE_naming_convention
     '''
-    def __init__(self, filename = f"{basedir}\\data\\NOWHERE_DATASET", naming_convention = f"{basedir}\\data\\NOWHERE_Naming_Convention"):
+    def __init__(self, filename = "app/data/NOWHERE_DATASET", naming_convention = "app/data/NOWHERE_Naming_Convention"):
         with open(f'{filename}.csv', 'r') as f:
             reader = csv.reader(f)
             csv_per_line = list(reader)
@@ -151,5 +151,4 @@ class NOWHERE():
         
         print("Dictionaries filled")
 
-h = NOWHERE()
-h
+nowhere_metadata = NOWHERE()

@@ -1,4 +1,4 @@
-document.getElementById("img").style.backgroundImage="url(../data/230_works_1024x/Access_2007.jpg)";
+document.getElementById("img").style.backgroundImage="url(../static/230_works_1024x/Access_2007.jpg)";
 // var img = new Image();
 // var div = document.getElementById('img').style.display="block";;
  
