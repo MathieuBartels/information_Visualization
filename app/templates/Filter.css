@@ -1,0 +1,16 @@
+.TotalFilters {
+    width: 402px;
+    border: 1px solid black;
+    overflow: hidden;
+}
+.FirtsButtons {
+    width: 200px;
+    float:left;
+    border: 1px solid red;
+}
+.hrz-txt-scroll {
+  width: 200px;
+  height: 300px;
+  padding: 15px;
+  overflow: auto;
+}

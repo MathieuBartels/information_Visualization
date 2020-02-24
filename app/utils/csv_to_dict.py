@@ -37,7 +37,7 @@ class NOWHERE():
     naming_convention: dict
         maps from the image name to the corresponding integer indicated in the NOWHERE_naming_convention
     '''
-    def __init__(self, filename = "NOWHERE_DATASET", naming_convention = "NOWHERE_Naming_Convention"):
+    def __init__(self, filename = f"..\\data\\NOWHERE_DATASET", naming_convention = f"..\\data\\NOWHERE_Naming_Convention"):
         with open(f'{filename}.csv', 'r') as f:
             reader = csv.reader(f)
             csv_per_line = list(reader)
