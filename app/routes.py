@@ -19,28 +19,56 @@ import numpy as np
 def home():
 	data = nowhere_metadata
 
+	#Create a dataframe of the csv file and sort it by name
+	df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
+	header = df.iloc[2]
+	df = pd.DataFrame(df.values[4:], columns=header)
+	df.columns.values[1] = "year"
+	df.rename(columns={'1= very related': 'name'}, inplace=True)
+	df.sort_values(by=['name'], inplace=True)
+
+	#Get urls of the images and add to the dataframe
+	images = os.listdir('app/static/230_works_1024x')
+	images = images[0:220]
+	urls = [f'/static/230_works_1024x/{image}' for image in images]
+	df['urls'] = urls
+	df.fillna(0, inplace=True)
+
+	df['x1'] = [1] * 220
+	df['y1'] = [1] * 220
+	df['w'] = [1] * 220
+	df['h'] = [1] * 220
+
+	data_source = ColumnDataSource(df)
+
+	xr = 10
+	yr = 10
+
+	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=1000, plot_height=1000,toolbar_location=None)
+	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
+
 	# images = os.listdir('app/static/230_works_1024x/')
 	# urls = [f'/static/230_works_1024x/{image}' for image in images]
-	images = os.listdir('app/static/thumbnails/')
-	urls = [f'/static/thumbnails/{image}' for image in images]
-	names = [image[:-4] for image in images]
-	image_to_source = {name : [source] for name, source in zip(names, urls)}
+	# images = os.listdir('app/static/thumbnails/')
+	# urls = [f'/static/thumbnails/{image}' for image in images]
+	# names = [image[:-4] for image in images]
+	# image_to_source = {name : [source] for name, source in zip(names, urls)}
 
 	user = {'username': 'Pepijn', 'im':'Selected Image'}
 
-	data_source = ColumnDataSource(image_to_source)
+	# data_source = ColumnDataSource(image_to_source)
 
-	image_selection = names # TODO make this selection more fancy and maybe dynamic
-	N = min(len(image_selection), 15)
-	xr = 10
-	yr = 10
-	x1 = np.linspace(0, xr, N+1)
-	y1 = np.linspace(0, yr, N+1)
+	# image_selection = names # TODO make this selection more fancy and maybe dynamic
+	# N = min(len(image_selection), 15)
+	# xr = 10
+	# yr = 10
+	# x1 = np.linspace(0, xr, N+1)
+	# y1 = np.linspace(0, yr, N+1)
 
-	#Greate figure
-	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=300, plot_height=500,toolbar_location=None)
-	for i, url in enumerate(image_selection):
-		p.image_url(url=url, x=x1[i % 15], y=i//15, w=xr/N, h=yr/N, source=data_source)
+	# #Greate figure
+	# p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=300, plot_height=500,toolbar_location=None)
+	# for i, url in enumerate(image_selection):
+	# 	p.image_url(url=url, x=x1[i % 15], y=i//15, w=xr/N, h=yr/N, source=data_source)
 
 	#Remove grid and axis
 	p.xgrid.visible = False
@@ -130,8 +158,6 @@ def view2():
 	
 	return render_template('view2.html',
 		user=user, images=images, data=data, l_square_script=l_square_script, l_square_div=l_square_div)
-	# output_file('view2.html')
-	# return render_template('view2.html', title='this is view2')
 
 @app.route('/favicon.ico')
 def favicon():
