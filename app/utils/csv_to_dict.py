@@ -41,7 +41,6 @@ class NOWHERE():
         maps from the image name to the corresponding integer indicated in the NOWHERE_naming_convention
     '''
     def __init__(self, filename = "app/data/NOWHERE_DATASET", naming_convention = "app/data/NOWHERE_Naming_Convention"):
-        filename = 
         naming_convention = os.path.join()
         with open(f'{filename}.csv', 'r') as f:
             reader = csv.reader(f)
