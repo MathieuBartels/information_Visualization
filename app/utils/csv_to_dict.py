@@ -2,7 +2,7 @@ import csv
 import os
 from collections import defaultdict
 
-basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+# basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 class NOWHERE():
     '''
@@ -40,8 +40,10 @@ class NOWHERE():
     naming_convention: dict
         maps from the image name to the corresponding integer indicated in the NOWHERE_naming_convention
     '''
+    # def __init__(self, filename = "data\\NOWHERE_DATASET", naming_convention = "data\\NOWHERE_Naming_Convention"):
     def __init__(self, filename = "app/data/NOWHERE_DATASET", naming_convention = "app/data/NOWHERE_Naming_Convention"):
-        naming_convention = os.path.join()
+        # filename = os.path.join(basedir, filename)
+        # naming_convention = os.path.join(basedir, naming_convention)
         with open(f'{filename}.csv', 'r') as f:
             reader = csv.reader(f)
             csv_per_line = list(reader)
