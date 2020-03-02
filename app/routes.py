@@ -1,5 +1,5 @@
 import os, json
-
+import random
 from bokeh.events import ButtonClick
 from flask import render_template, request, jsonify, send_from_directory
 
@@ -9,6 +9,9 @@ from bokeh.layouts import row, column, widgetbox, layout, gridplot
 from bokeh.models import ColumnDataSource, Range1d,  CustomJS, Slider
 
 from bokeh.io import output_file, show
+from bokeh.models.glyphs import Text
+from bokeh.models.widgets import PreText
+from bokeh.models import Label
 from bokeh.models.widgets import Button, TextInput, Select
 
 
@@ -23,7 +26,6 @@ import numpy as np
 @app.route('/home', methods = ['GET', 'POST'])
 def home():
 	data = nowhere_metadata
-	print(type(data.human_factor))
 	
 	human_factor_data = pd.DataFrame(dict(data.human_factor), index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction']) 
 	geography_data = pd.DataFrame(dict(data.geography), index=['Europe', 'Nrth America', 'Middle East', 'Asia', 'Sth America'])
@@ -41,7 +43,7 @@ def home():
 	goals_sources = ColumnDataSource(data=goals_data)
 	means_sources = ColumnDataSource(data=means_data)
 	my_approach_sources = ColumnDataSource(data=my_approach_data)
-	content_to_met_sources = ColumnDataSource(data=content_to_me_data)
+	content_to_me_sources = ColumnDataSource(data=content_to_me_data)
 	
 	#Creating a dataframe that can be used for the bokeh input
 	df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
@@ -115,29 +117,44 @@ def home():
 	# So this needs to communicate with the buttons which is not hard, and the subsubjects is also not hard
 	# the hard thing could be that this needs to change on click, so the sliders will need to change on a click of the button, how to do???
 	sources = [human_factor_sources, geography_sources, reality_sources,domains_sources,
-		goals_sources, means_sources, my_approach_sources, content_to_met_sources]
+		goals_sources, means_sources, my_approach_sources, content_to_me_sources]
+
+	# only the first works because of the hard-coded sliders
 	sources = sources[0]
+
+	# The names of the sub-catogory data instead of sources is the pandas df
+	sub_cat_names = human_factor_data.index.values
+
+	# TODO this needs to be an on-click image, now its just a random image
+	test_image = random.choice(list(data.naming_convention.keys()))
+	print(test_image)
 	
-	test_image = 'CH-1995-1' # this needs to be the on-click image
-	
-	# TODO Make these interactive with click on the button, the active filter change??
+	# TODO Make these active filters interactive with click on the image
 	slider_1_value = 'Private'
 	slider_2_value = "Public"
 	slider_3_value = 'Interaction'
 	slider_4_value = 'Corporate'
 	slider_5_value = 'Politics'
 
-	topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]} # TODO fill in all the indices from all arrays (lots of work)
+	 # TODO fill in all the indices from all arrays (lots of work), all the subcategories have an unique index in their own category
+	topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]}
 	
-	active_text = TextInput(value="", title="Active Filters")
+	active_text = PreText(text="Active Filters",width=200, height=40)
+
+	# All the slider modules
 	active_1 = Slider(title=slider_1_value, value=sources.data[test_image][topic_to_idx[slider_1_value][0]], start=0, end=1, step=0.01)
 	active_2 = Slider(title=slider_2_value, value=sources.data[test_image][topic_to_idx[slider_2_value][0]], start=0, end=1, step=0.01)
 	active_3 = Slider(title=slider_3_value, value=sources.data[test_image][topic_to_idx[slider_3_value][0]], start=0, end=1, step=0.01)
 	active_4 = Slider(title=slider_4_value, value=sources.data[test_image][topic_to_idx[slider_4_value][0]], start=0, end=1, step=0.01) 
 	active_5 = Slider(title=slider_5_value, value=sources.data[test_image][topic_to_idx[slider_5_value][0]], start=0, end=1, step=0.01)
 
+	# leave this after the sliders because this thing is not a dict
 	topic_to_idx = ColumnDataSource(topic_to_idx)
+
+	# current image for active filters etc
 	current_im = ColumnDataSource({'im':[test_image]})
+
+	# create a list of the active sliders
 	all_sliders = [active_1, active_2, active_3, active_4, active_5]
 
 	callback = CustomJS(args=dict(source=sources, tti=topic_to_idx, current_image=current_im), code="""
