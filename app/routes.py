@@ -125,6 +125,8 @@ def home():
 
 	# TODO active sliders need to be created when a click happens on the image
 	# 1) click happens on image 2) top values of the image become active filters
+	# So this needs to communicate with the buttons which is not hard, and the subsubjects is also not hard
+	# the hard thing could be that this needs to change on click, so the sliders will need to change on a click of the button, how to do???
 	test_image = 'CH-1995-3' # this needs to be the on-click image
 	slider_1_value = 'Private'
 	slider_2_value = "Public"
