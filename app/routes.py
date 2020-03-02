@@ -124,90 +124,44 @@ def home():
 	btn_contenttome = Button(label="Content To Me", button_type="primary")
 
 	# TODO active sliders need to be created when a click happens on the image
-	# 1) click happens on image 2) top values of the image become active filters 3) slider changes the csv file
+	# 1) click happens on image 2) top values of the image become active filters
 	test_image = 'CH-1995-3' # this needs to be the on-click image
 	slider_1_value = 'Private'
 	slider_2_value = "Public"
 	slider_3_value = 'Interaction'
+	slider_4_value = 'Corporate'
+	slider_5_value = 'Politics'
+
+	topic_to_idx = {'Corporate':[0], 'Politics': [1], 'Private':[2], 'Public':[3],'Interaction':[4]} # gambled corporate/politics idx values
 
 	active_text = TextInput(value="", title="Active Filters")
-	# active_1 = Slider(title=slider_1_value, value=data.human_factor[test_image][slider_1_value], start=0, end=1, step=0.01)
-	# active_2 = Slider(title=slider_2_value, value=data.human_factor[test_image][slider_2_value], start=0, end=1, step=0.01)
-	# active_3 = Slider(title=slider_3_value, value=data.human_factor[test_image][slider_3_value], start=0, end=1, step=0.01)
-	active_1 = Slider(title=slider_1_value, value=sources.data['CH-1995-3'][2], start=0, end=1, step=0.01)
-	active_2 = Slider(title=slider_2_value, value=sources.data['CH-1995-3'][3], start=0, end=1, step=0.01)
-	active_3 = Slider(title=slider_3_value, value=sources.data['CH-1995-3'][4], start=0, end=1, step=0.01)
-	# active_4 = Slider(title="Corporate", value=0.3, start=0, end=1, step=0.01)
-	# active_5 = Slider(title="Politics", value=0.3, start=0, end=1, step=0.01)
+	active_1 = Slider(title=slider_1_value, value=sources.data['CH-1995-3'][topic_to_idx[slider_1_value][0]], start=0, end=1, step=0.01)
+	active_2 = Slider(title=slider_2_value, value=sources.data['CH-1995-3'][topic_to_idx[slider_2_value][0]], start=0, end=1, step=0.01)
+	active_3 = Slider(title=slider_3_value, value=sources.data['CH-1995-3'][topic_to_idx[slider_3_value][0]], start=0, end=1, step=0.01)
+	active_4 = Slider(title=slider_4_value, value=sources.data['CH-1995-3'][topic_to_idx[slider_4_value][0]], start=0, end=1, step=0.01) 
+	active_5 = Slider(title=slider_5_value, value=sources.data['CH-1995-3'][topic_to_idx[slider_5_value][0]], start=0, end=1, step=0.01)
 
-	callback = CustomJS(args=dict(source=sources), code="""
-		var data = source.data;
+	topic_to_idx = ColumnDataSource(topic_to_idx)
+	all_sliders = [active_1, active_2, active_3, active_4, active_5]
+	callback = CustomJS(args=dict(source=sources, tti=topic_to_idx), code="""
+		var data = source.data
+		var tti = tti.data
 		var values = data["values"];
 		var value = cb_obj.value;
 		var var_text = cb_obj.title;
-		console.log(value);
-		data['CH-1995-3'][2] = value
+		data['CH-1995-3'][tti[var_text]] = value
 		source.data = data
 		source.change.emit()
-		console.log(data['CH-1995-3'][2]);
-
-		
-
+		console.log(data['CH-1995-3'][tti[var_text]]);
         var variable;
 		var value_idx;
-		// updatePlot(value, var_text); 
-        // socket.on('plot_update', function(msg) {
-        //    value = msg.new_value;
-        //     variable = msg.variable;
-		// 	value_idx = msg.index;
-
-		// 	console.log(value);
-		// 	console.log(value_idx);
-		// 	console.log(variable);
-		// 	values[value_idx] = value;
-		// 	data.values = values;
-		// 	source.data = data;
-		// 	source.change.emit();
-
-		// 	window.onmouseup = function() {
-		// 		updateModel(value, variable);
-		// 	}
-        // });
 	""")
 
-	# for slider in all_sliders:
-	active_1.js_on_change('value', callback)
-	# j_script = """
-	# 	# var f = cb_obj.value;
-	# 	# var sdata = source;
-	# 	# var back_value = slider.value;
-	# 	# var b = cb_obj.value;
-	# 	console.log('jsworking?')
-	# 	# console.log(sdata)
-	# 	# sdata['CH-1995-3'][2].push(b)
-	# 	# for (key in sdata) {
-	# 	# 	sdata[key].push(b);
-	# 	# }
-	# 	# console.log(source.data['CH-1995-3'][2])
-	# 	# source.change.emit();
-	# 	"""
-	# callback = CustomJS(args=dict(source=source), code=j_script)
-	# active_1.js_on_change('value', callback)
-	# active_1 = Slider(title=slider_1_value, value=source.data['CH-1995-3'][2], start=0, end=1, step=0.01, callback=callback)
-	# active_1.callback = CustomJS(args=dict(source=source),code=jvscript)
-	# def callback(source=source, window=None):
-	# 	data = source.data
-	# 	f = cb_obj.value
-	# 	data['CH-1995-3'][2] = f
-	# 	console.log(f)
-	# 	# x, y = data['x'], data['y']
-	# 	# for i in range(len(x)):
-	# 	# 	y[i] = window.Math.pow(x[i], f)
-	# 	source.change.emit()
-	# active_1 = Slider(title=slider_1_value, value=source.data['CH-1995-3'][2], start=0, end=1, step=0.01, callback=CustomJS.from_py_func(callback))
+	for slider in all_sliders:
+		slider.js_on_change('value', callback)
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
-	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, active_1, active_2, active_3])
+	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, *all_sliders])
 
 	# define the components: the javascript used and the div
 	grid = layout([[button_grid,p]])
