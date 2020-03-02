@@ -9,7 +9,7 @@ from bokeh.layouts import row, column, widgetbox, layout, gridplot
 from bokeh.models import ColumnDataSource, Range1d,  CustomJS, Slider
 
 from bokeh.io import output_file, show
-from bokeh.models.widgets import Button, TextInput
+from bokeh.models.widgets import Button, TextInput, Dropdown
 
 
 from app import app
@@ -23,7 +23,6 @@ import numpy as np
 @app.route('/home', methods = ['GET', 'POST'])
 def home():
 	data = nowhere_metadata
-
 	#Creating a dataframe that can be used for the bokeh input
 	df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
 	header = df.iloc[2]
@@ -108,6 +107,7 @@ def home():
 	
 
 	btn_geography = Button(label="Geography", button_type="primary")
+	
 	btn_reality = Button(label="Reality", button_type="danger")
 	btn_humanfactor = Button(label="Human Factor", button_type="warning")
 	btn_domains = Button(label="Domains", button_type="success")
@@ -116,21 +116,30 @@ def home():
 	btn_myapproach = Button(label="My Approach", button_type="danger")
 	btn_contenttome = Button(label="Content To Me", button_type="primary")
 
+	# TODO active sliders need to be created when a click happens on the image
+	# 1) click happens on image 2) top values of the image become active filters 3) slider changes the csv file
+	test_image = 'CH-1995-3' # this needs to be the on-click image
+	available_filters = list(data.human_factor[test_image].keys()) # oeps pepijn is a bad programmer, how to get the sub-subjects which are not there????
+	slider_1_value = 'Private'
+	slider_2_value = "Public"
+	slider_3_value = 'Interaction'
+
 	active_text = TextInput(value="", title="Active Filters")
-	active_1 = Slider(title="Active subject 1", value=0.6, start=0, end=1, step=0.01)
-	active_2 = Slider(title="Active subject 2", value=0.3, start=0, end=1, step=0.01)
-	active_3 = Slider(title="Active subject 3", value=0.6, start=0, end=1, step=0.01)
-	active_4 = Slider(title="Active subject 4", value=0.3, start=0, end=1, step=0.01)
+	active_1 = Slider(title=slider_1_value, value=data.human_factor[test_image][slider_1_value], start=0, end=1, step=0.01)
+	active_2 = Slider(title=slider_2_value, value=data.human_factor[test_image][slider_2_value], start=0, end=1, step=0.01)
+	active_3 = Slider(title=slider_3_value, value=data.human_factor[test_image][slider_3_value], start=0, end=1, step=0.01)
+	# active_4 = Slider(title="Corporate", value=0.3, start=0, end=1, step=0.01)
+	# active_5 = Slider(title="Politics", value=0.3, start=0, end=1, step=0.01)
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
-	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, active_1, active_2, active_3, active_4])
+	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, active_1, active_2, active_3])
 
 	# define the components: the javascript used and the div
 	grid = layout([[button_grid,p]])
 
 	l_square_script, l_square_div = components(grid)
 
-	return render_template('view3.html',
+	return render_template('home.html',
 		user=user, images=images, data=data, l_square_script=l_square_script, l_square_div=l_square_div)
 	# return render_template('view3.html', title='Welcome!')
 
@@ -195,39 +204,39 @@ def favicon():
 	return send_from_directory(os.path.join(app.root_path, 'static'),
 										'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-@app.route("/filter", methods = ['GET', 'POST'])
-def filter():
+# @app.route("/filter", methods = ['GET', 'POST'])
+# def filter():
 
-	#Buttons Maybe use for-loop?
-	btn_geography = Button(label="Geography", button_type="primary")
-	btn_reality = Button(label="Reality", button_type="danger")
-	btn_humanfactor = Button(label="Human Factor", button_type="warning")
-	btn_domains = Button(label="Domains", button_type="success")
-	btn_goals = Button(label="Goals", button_type="success")
-	btn_means = Button(label="Means", button_type="warning")
-	btn_myapproach = Button(label="My Approach", button_type="danger")
-	btn_contenttome = Button(label="Content To Me", button_type="primary")
+# 	#Buttons Maybe use for-loop?
+# 	btn_geography = Button(label="Geography", button_type="primary")
+# 	btn_reality = Button(label="Reality", button_type="danger")
+# 	btn_humanfactor = Button(label="Human Factor", button_type="warning")
+# 	btn_domains = Button(label="Domains", button_type="success")
+# 	btn_goals = Button(label="Goals", button_type="success")
+# 	btn_means = Button(label="Means", button_type="warning")
+# 	btn_myapproach = Button(label="My Approach", button_type="danger")
+# 	btn_contenttome = Button(label="Content To Me", button_type="primary")
 
-	grid = gridplot([[btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome]])
+# 	grid = gridplot([[btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome]])
 
-	script, div = components(grid)
-	#Components for placing it on html
-	script0, div0 = components(btn_geography)
-	script1, div1 = components(btn_reality)
-	script2, div2 = components(btn_humanfactor)
-	script3, div3 = components(btn_domains)
-	script4, div4 = components(btn_goals)
-	script5, div5 = components(btn_means)
-	script6, div6 = components(btn_myapproach)
-	script7, div7 = components(btn_contenttome)
+# 	script, div = components(grid)
+# 	#Components for placing it on html
+# 	script0, div0 = components(btn_geography)
+# 	script1, div1 = components(btn_reality)
+# 	script2, div2 = components(btn_humanfactor)
+# 	script3, div3 = components(btn_domains)
+# 	script4, div4 = components(btn_goals)
+# 	script5, div5 = components(btn_means)
+# 	script6, div6 = components(btn_myapproach)
+# 	script7, div7 = components(btn_contenttome)
 
 
-	return render_template('filter.html', title='this is left square',
-						   script0=script0, div0=div0, btn_geography=btn_geography,
-						   script1=script1, div1=div1, btn_reality=btn_reality,
-						   script2=script2, div2=div2, btn_humanfactor=btn_humanfactor,
-						   script3=script3, div3=div3, btn_domains=btn_domains,
-						   script4=script4, div4=div4, btn_goals=btn_goals,
-						   script5=script5, div5=div5, btn_means=btn_means,
-						   script6=script6, div6=div6, btn_myapproach=btn_myapproach,
-						   script7=script7, div7=div7, btn_contenttome=btn_contenttome)
+# 	return render_template('filter.html', title='this is left square',
+# 						   script0=script0, div0=div0, btn_geography=btn_geography,
+# 						   script1=script1, div1=div1, btn_reality=btn_reality,
+# 						   script2=script2, div2=div2, btn_humanfactor=btn_humanfactor,
+# 						   script3=script3, div3=div3, btn_domains=btn_domains,
+# 						   script4=script4, div4=div4, btn_goals=btn_goals,
+# 						   script5=script5, div5=div5, btn_means=btn_means,
+# 						   script6=script6, div6=div6, btn_myapproach=btn_myapproach,
+# 						   script7=script7, div7=div7, btn_contenttome=btn_contenttome)
