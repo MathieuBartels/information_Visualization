@@ -23,6 +23,8 @@ def home():
 	data = nowhere_metadata
 	print(type(data.human_factor))
 	
+	data2 = pd.DataFrame(dict(data.human_factor), index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction']) 
+	print(data2['CH-1995-1'])
 	source = ColumnDataSource(data=data2)
 	print(source)
 	#Creating a dataframe that can be used for the bokeh input
