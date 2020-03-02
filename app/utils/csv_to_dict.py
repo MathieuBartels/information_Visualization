@@ -55,7 +55,8 @@ class NOWHERE():
         self.year = {}
         self.geography = {}
         self.reality = defaultdict(dict)
-        self.human_factor = defaultdict(dict)
+        # self.human_factor = defaultdict(dict)
+        self.human_factor = defaultdict(list) # columndata bokeh needs a list
         self.domains = defaultdict(dict)
         self.goals = defaultdict(dict)
         self.means = defaultdict(dict)
@@ -106,13 +107,20 @@ class NOWHERE():
                         self.reality[i[0]][ri] = float(i[column_val + 7])
                     except:
                         continue
-
+            
             for column_val, ri in enumerate(human_factors_l):
                 if i[column_val + 28] != "":
                     try:
-                        self.human_factor[i[0]][ri] = float(i[column_val + 28])
+                        self.human_factor[i[0]].append(float(i[column_val + 28])) 
                     except:
+                        self.human_factor[i[0]].append(float(0)) 
                         continue
+                    # try:
+                    #     self.human_factor[i[0]][ri] = float(i[column_val + 28]) # dict method
+                    # except:
+                    #     continue
+                else:
+                    self.human_factor[i[0]].append(float(0)) 
 
             for column_val, ri in enumerate(domains_l):
                 if i[column_val + 33] != "":
