@@ -7,10 +7,9 @@ from bokeh.plotting import output_file, figure
 from bokeh.embed import components
 from bokeh.layouts import row, column, widgetbox, layout, gridplot
 from bokeh.models import ColumnDataSource, Range1d,  CustomJS, Slider
-from bokeh.models import ColumnDataSource, Range1d, CustomJS
 
 from bokeh.io import output_file, show
-from bokeh.models.widgets import Button
+from bokeh.models.widgets import Button, TextInput
 
 
 from app import app
@@ -116,17 +115,19 @@ def home():
 	btn_means = Button(label="Means", button_type="warning")
 	btn_myapproach = Button(label="My Approach", button_type="danger")
 	btn_contenttome = Button(label="Content To Me", button_type="primary")
-	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
-	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
 
-	# but_script, but_div = components(button_grid)
-	
-	# the layout is a grid: square -- image -- square
-	# grid = gridplot([[grid, p]], plot_width=600, plot_height=600, toolbar_location = None)
+	active_text = TextInput(value="", title="Active Filters")
+	active_1 = Slider(title="Active subject 1", value=0.6, start=0, end=1, step=0.01)
+	active_2 = Slider(title="Active subject 2", value=0.3, start=0, end=1, step=0.01)
+	active_3 = Slider(title="Active subject 3", value=0.6, start=0, end=1, step=0.01)
+	active_4 = Slider(title="Active subject 4", value=0.3, start=0, end=1, step=0.01)
+
+	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
+	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, active_1, active_2, active_3, active_4])
 
 	# define the components: the javascript used and the div
 	grid = layout([[button_grid,p]])
-	
+
 	l_square_script, l_square_div = components(grid)
 
 	return render_template('view3.html',
