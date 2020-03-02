@@ -25,33 +25,40 @@ import numpy as np
 def home():
 	data = nowhere_metadata
 
-	#Create a dataframe of the csv file and sort it by name
+	#Creating a dataframe that can be used for the bokeh input
 	df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
 	header = df.iloc[2]
 	df = pd.DataFrame(df.values[4:], columns=header)
-	df.columns.values[1] = "year"
 	df.rename(columns={'1= very related': 'name'}, inplace=True)
+	df.columns.values[1] = "year"	
+	df.fillna(0, inplace=True)
 	df.sort_values(by=['name'], inplace=True)
-
+	df['rank'] = range(1, 221)
+	
 	#Get urls of the images and add to the dataframe
 	images = os.listdir('app/static/230_works_1024x')
 	images = images[0:220]
 	urls = [f'/static/230_works_1024x/{image}' for image in images]
 	df['urls'] = urls
-	df.fillna(0, inplace=True)
+	
+	#Plot formatting
+	image_height = 1
+	image_width = 1
+	per_row = 10
+	xr = per_row * image_width
+	yr = 220 / per_row * image_height
 
-	df['x1'] = [1] * 220
-	df['y1'] = [1] * 220
-	df['w'] = [1] * 220
-	df['h'] = [1] * 220
-
+	#Add columns to the dataframe for the placing and formatting
+	df['w'] = [image_width] * 220
+	df['h'] = [image_height] * 220
+	df['x1'] = (df['rank'] - 1) % per_row
+	df['y1'] = yr - (df['rank'] - 1) // per_row
+	
 	data_source = ColumnDataSource(df)
 
-	xr = 10
-	yr = 10
-
-	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=1000, plot_height=1000,toolbar_location=None)
+	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=2000, plot_height=2000, toolbar_location=None)
 	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
+
 
 	# images = os.listdir('app/static/230_works_1024x/')
 	# urls = [f'/static/230_works_1024x/{image}' for image in images]
