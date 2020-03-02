@@ -9,7 +9,7 @@ from bokeh.layouts import row, column, widgetbox, layout, gridplot
 from bokeh.models import ColumnDataSource, Range1d,  CustomJS, Slider
 
 from bokeh.io import output_file, show
-from bokeh.models.widgets import Button, TextInput, Dropdown
+from bokeh.models.widgets import Button, TextInput, Select
 
 
 from app import app
@@ -25,11 +25,24 @@ def home():
 	data = nowhere_metadata
 	print(type(data.human_factor))
 	
-	data2 = pd.DataFrame(dict(data.human_factor), index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction']) 
-	print(data2['CH-1995-3'])
-	sources = ColumnDataSource(data=data2)
-	print(type(sources.data))
-	print(sources.data['CH-1995-3'])
+	human_factor_data = pd.DataFrame(dict(data.human_factor), index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction']) 
+	geography_data = pd.DataFrame(dict(data.geography), index=['Europe', 'Nrth America', 'Middle East', 'Asia', 'Sth America'])
+	reality_data = pd.DataFrame(dict(data.reality), index=['Void', 'Non-place', 'Space', 'Nature', 'Development', 'Suburbia', 'Urbanisation', 'Sprawl', 'One Building', 'Part of a building', 'City Center', 'Grid/Order', 'Interior', 'Poster', 'Screen', 'Facade', 'Geographically Specific', 'Public Space', 'Private Space', 'Model', 'Plan'])
+	domains_data = pd.DataFrame(dict(data.domains), index=['Advertising / Promotion', 'Philosophy', 'Sociology', 'Communication', 'Urbanity', 'Science', 'Entertainment / Leisure', 'Industry', 'Information', 'Art', 'Architecture', 'Design', 'Public Service', 'Transportation', 'Nature']) # , index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction'] 
+	goals_data = pd.DataFrame(dict(data.goals), index=['Control', 'Power', 'Consuming', 'Knowledge', 'Information', 'Surveillance', 'Security', 'Money Wealth', 'Change', 'Progress', 'Community', 'Empowerment', 'Decoration', 'Escape', 'Symbolism', 'Globalisation', 'Mobility', 'Visibility', 'Fun']) 
+	means_data = pd.DataFrame(dict(data.means), index=['Confrontation', 'Exaggaration', 'Exclusivity', 'Conditioning', 'Repetition', 'Experimentation', 'Celebration', 'Chaos', 'Presence', 'Selection', 'Isolation', 'Manipulation', 'Persuasion', 'Promise', 'CoÃ¶peration', 'Variety', 'Improvisation', 'Destruction', 'Reconstruction', 'Simplification', 'Planning', 'Constrainment', 'System']) 
+	my_approach_data = pd.DataFrame(dict(data.my_approach), index=['About the medium', 'Documentary', 'Abstraction', 'Framing', 'Scaling', 'Reflection', 'Symmetry', 'Repeating elements', 'Composite', 'Front facing', 'Angle', 'Looking Up', 'Bird Eye View', 'Importance of Detail', 'Blur', 'Video', 'Long Exposure', 'Loop', 'Time Lapse', 'Crossover', 'Layers', 'Photoshop', 'Archetype', 'Metaphor', 'Location focus']) 
+	content_to_me_data = pd.DataFrame(dict(data.content_to_me), index=['Desire', 'Greed', 'Competition', 'Illusion', 'Attraction / Play', 'Memory', 'Solution', 'Contemplation', 'Images Rule', 'Movie references', 'Game references', 'Future Orientation', 'Ambition', 'Tradition', '24/7', 'Digitalisation', 'Degradation', 'Loneliness', 'Anonimity', 'Inhabitation', 'Individuality', 'Identity', 'Austerity', 'Limitation', 'Convention', 'Struggle', 'Interference', 'Substitution', 'Alienation', 'Space & Time', 'Pretention', 'Addiction', 'Belief/disbelief', 'High/Kick']) 
+	
+	human_factor_sources = ColumnDataSource(data=human_factor_data)
+	geography_sources = ColumnDataSource(data=geography_data)
+	reality_sources = ColumnDataSource(data=reality_data)
+	domains_sources = ColumnDataSource(data=domains_data)
+	goals_sources = ColumnDataSource(data=goals_data)
+	means_sources = ColumnDataSource(data=means_data)
+	my_approach_sources = ColumnDataSource(data=my_approach_data)
+	content_to_met_sources = ColumnDataSource(data=content_to_me_data)
+	
 	#Creating a dataframe that can be used for the bokeh input
 	df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
 	header = df.iloc[2]
@@ -64,30 +77,6 @@ def home():
 	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=2000, plot_height=2000, toolbar_location=None)
 	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
 
-
-	# images = os.listdir('app/static/230_works_1024x/')
-	# urls = [f'/static/230_works_1024x/{image}' for image in images]
-	# images = os.listdir('app/static/thumbnails/')
-	# urls = [f'/static/thumbnails/{image}' for image in images]
-	# names = [image[:-4] for image in images]
-	# image_to_source = {name : [source] for name, source in zip(names, urls)}
-
-	user = {'username': 'Pepijn', 'im':'Selected Image'}
-
-	# data_source = ColumnDataSource(image_to_source)
-
-	# image_selection = names # TODO make this selection more fancy and maybe dynamic
-	# N = min(len(image_selection), 15)
-	# xr = 10
-	# yr = 10
-	# x1 = np.linspace(0, xr, N+1)
-	# y1 = np.linspace(0, yr, N+1)
-
-	# #Greate figure
-	# p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=300, plot_height=500,toolbar_location=None)
-	# for i, url in enumerate(image_selection):
-	# 	p.image_url(url=url, x=x1[i % 15], y=i//15, w=xr/N, h=yr/N, source=data_source)
-
 	#Remove grid and axis
 	p.xgrid.visible = False
 	p.ygrid.visible = False
@@ -111,10 +100,8 @@ def home():
 	r_square.axis.visible = False
 	r_square.xgrid.grid_line_color = None
 
-	
 
 	btn_geography = Button(label="Geography", button_type="primary")
-	
 	btn_reality = Button(label="Reality", button_type="danger")
 	btn_humanfactor = Button(label="Human Factor", button_type="warning")
 	btn_domains = Button(label="Domains", button_type="success")
@@ -127,36 +114,45 @@ def home():
 	# 1) click happens on image 2) top values of the image become active filters
 	# So this needs to communicate with the buttons which is not hard, and the subsubjects is also not hard
 	# the hard thing could be that this needs to change on click, so the sliders will need to change on a click of the button, how to do???
-	test_image = 'CH-1995-3' # this needs to be the on-click image
+	sources = [human_factor_sources, geography_sources, reality_sources,domains_sources,
+		goals_sources, means_sources, my_approach_sources, content_to_met_sources]
+	sources = sources[0]
+	
+	test_image = 'CH-1995-1' # this needs to be the on-click image
+	
+	# TODO Make these interactive with click on the button, the active filter change??
 	slider_1_value = 'Private'
 	slider_2_value = "Public"
 	slider_3_value = 'Interaction'
 	slider_4_value = 'Corporate'
 	slider_5_value = 'Politics'
 
-	topic_to_idx = {'Corporate':[0], 'Politics': [1], 'Private':[2], 'Public':[3],'Interaction':[4]} # gambled corporate/politics idx values
-
+	topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]} # TODO fill in all the indices from all arrays (lots of work)
+	
 	active_text = TextInput(value="", title="Active Filters")
-	active_1 = Slider(title=slider_1_value, value=sources.data['CH-1995-3'][topic_to_idx[slider_1_value][0]], start=0, end=1, step=0.01)
-	active_2 = Slider(title=slider_2_value, value=sources.data['CH-1995-3'][topic_to_idx[slider_2_value][0]], start=0, end=1, step=0.01)
-	active_3 = Slider(title=slider_3_value, value=sources.data['CH-1995-3'][topic_to_idx[slider_3_value][0]], start=0, end=1, step=0.01)
-	active_4 = Slider(title=slider_4_value, value=sources.data['CH-1995-3'][topic_to_idx[slider_4_value][0]], start=0, end=1, step=0.01) 
-	active_5 = Slider(title=slider_5_value, value=sources.data['CH-1995-3'][topic_to_idx[slider_5_value][0]], start=0, end=1, step=0.01)
+	active_1 = Slider(title=slider_1_value, value=sources.data[test_image][topic_to_idx[slider_1_value][0]], start=0, end=1, step=0.01)
+	active_2 = Slider(title=slider_2_value, value=sources.data[test_image][topic_to_idx[slider_2_value][0]], start=0, end=1, step=0.01)
+	active_3 = Slider(title=slider_3_value, value=sources.data[test_image][topic_to_idx[slider_3_value][0]], start=0, end=1, step=0.01)
+	active_4 = Slider(title=slider_4_value, value=sources.data[test_image][topic_to_idx[slider_4_value][0]], start=0, end=1, step=0.01) 
+	active_5 = Slider(title=slider_5_value, value=sources.data[test_image][topic_to_idx[slider_5_value][0]], start=0, end=1, step=0.01)
 
 	topic_to_idx = ColumnDataSource(topic_to_idx)
+	current_im = ColumnDataSource({'im':[test_image]})
 	all_sliders = [active_1, active_2, active_3, active_4, active_5]
-	callback = CustomJS(args=dict(source=sources, tti=topic_to_idx), code="""
+
+	callback = CustomJS(args=dict(source=sources, tti=topic_to_idx, current_image=current_im), code="""
 		var data = source.data
 		var tti = tti.data
+		var im_name = current_image.data['im'][0]
+
 		var values = data["values"];
 		var value = cb_obj.value;
 		var var_text = cb_obj.title;
-		data['CH-1995-3'][tti[var_text]] = value
+
+		data[im_name][tti[var_text]] = value
 		source.data = data
 		source.change.emit()
-		console.log(data['CH-1995-3'][tti[var_text]]);
-        var variable;
-		var value_idx;
+		console.log(data[im_name][tti[var_text]]);
 	""")
 
 	for slider in all_sliders:
@@ -171,7 +167,7 @@ def home():
 	l_square_script, l_square_div = components(grid)
 
 	return render_template('home.html',
-		user=user, images=images, data=data, l_square_script=l_square_script, l_square_div=l_square_div)
+		images=images, data=data, l_square_script=l_square_script, l_square_div=l_square_div)
 	# return render_template('view3.html', title='Welcome!')
 
 @app.route("/view2", methods = ['GET', 'POST'])
@@ -185,7 +181,6 @@ def view2():
 	names = [image[:-4] for image in images]
 	image_to_source = {name : [source] for name, source in zip(names, urls)}
 
-	user = {'username': 'Pepijn', 'im':'Selected Image'}
 
 	data_source = ColumnDataSource(image_to_source)
 
@@ -227,8 +222,7 @@ def view2():
 	# define the components: the javascript used and the div
 	l_square_script, l_square_div = components(grid)
 	
-	return render_template('view2.html',
-		user=user, images=images, data=data, l_square_script=l_square_script, l_square_div=l_square_div)
+	return render_template('view2.html', images=images, data=data, l_square_script=l_square_script, l_square_div=l_square_div)
 
 @app.route('/favicon.ico')
 def favicon():
