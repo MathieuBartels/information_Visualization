@@ -5,7 +5,7 @@ from flask import render_template, request, jsonify, send_from_directory
 
 from bokeh.plotting import output_file, figure
 from bokeh.embed import components
-from bokeh.layouts import gridplot
+from bokeh.layouts import row, column, widgetbox, layout, gridplot
 from bokeh.models import ColumnDataSource, Range1d,  CustomJS, Slider
 from bokeh.models import ColumnDataSource, Range1d, CustomJS
 
@@ -99,12 +99,29 @@ def home():
 	r_square.axis.visible = False
 	r_square.xgrid.grid_line_color = None
 
+	
+
+	btn_geography = Button(label="Geography", button_type="primary")
+	btn_reality = Button(label="Reality", button_type="danger")
+	btn_humanfactor = Button(label="Human Factor", button_type="warning")
+	btn_domains = Button(label="Domains", button_type="success")
+	btn_goals = Button(label="Goals", button_type="success")
+	btn_means = Button(label="Means", button_type="warning")
+	btn_myapproach = Button(label="My Approach", button_type="danger")
+	btn_contenttome = Button(label="Content To Me", button_type="primary")
+	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
+	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
+
+	# but_script, but_div = components(button_grid)
+	
 	# the layout is a grid: square -- image -- square
-	grid = gridplot([[l_square, p]], plot_width=600, plot_height=600, toolbar_location = None)
+	# grid = gridplot([[grid, p]], plot_width=600, plot_height=600, toolbar_location = None)
 
 	# define the components: the javascript used and the div
-	l_square_script, l_square_div = components(grid)
+	grid = layout([[button_grid,p]])
 	
+	l_square_script, l_square_div = components(grid)
+
 	return render_template('view3.html',
 		user=user, images=images, data=data, l_square_script=l_square_script, l_square_div=l_square_div)
 	# return render_template('view3.html', title='Welcome!')
@@ -183,6 +200,9 @@ def filter():
 	btn_myapproach = Button(label="My Approach", button_type="danger")
 	btn_contenttome = Button(label="Content To Me", button_type="primary")
 
+	grid = gridplot([[btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome]])
+
+	script, div = components(grid)
 	#Components for placing it on html
 	script0, div0 = components(btn_geography)
 	script1, div1 = components(btn_reality)
