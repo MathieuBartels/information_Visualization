@@ -26,9 +26,10 @@ def home():
 	print(type(data.human_factor))
 	
 	data2 = pd.DataFrame(dict(data.human_factor), index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction']) 
-	print(data2['CH-1995-1'])
-	source = ColumnDataSource(data=data2)
-	print(source)
+	print(data2['CH-1995-3'])
+	sources = ColumnDataSource(data=data2)
+	print(type(sources.data))
+	print(sources.data['CH-1995-3'])
 	#Creating a dataframe that can be used for the bokeh input
 	df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
 	header = df.iloc[2]
@@ -133,29 +134,77 @@ def home():
 	# active_1 = Slider(title=slider_1_value, value=data.human_factor[test_image][slider_1_value], start=0, end=1, step=0.01)
 	# active_2 = Slider(title=slider_2_value, value=data.human_factor[test_image][slider_2_value], start=0, end=1, step=0.01)
 	# active_3 = Slider(title=slider_3_value, value=data.human_factor[test_image][slider_3_value], start=0, end=1, step=0.01)
-	active_1 = Slider(title=slider_1_value, value=0.6, start=0, end=1, step=0.01)
-	active_2 = Slider(title=slider_2_value, value=0.6, start=0, end=1, step=0.01)
-	active_3 = Slider(title=slider_3_value, value=0.6, start=0, end=1, step=0.01)
+	active_1 = Slider(title=slider_1_value, value=sources.data['CH-1995-3'][2], start=0, end=1, step=0.01)
+	active_2 = Slider(title=slider_2_value, value=sources.data['CH-1995-3'][3], start=0, end=1, step=0.01)
+	active_3 = Slider(title=slider_3_value, value=sources.data['CH-1995-3'][4], start=0, end=1, step=0.01)
 	# active_4 = Slider(title="Corporate", value=0.3, start=0, end=1, step=0.01)
 	# active_5 = Slider(title="Politics", value=0.3, start=0, end=1, step=0.01)
-	# jvscript = """
-	# 	var f = cb_obj.value;
-	# 	var sdata = source.data;
 
-	# 	console.log(sdata);
+	callback = CustomJS(args=dict(source=sources), code="""
+		var data = source.data;
+		var values = data["values"];
+		var value = cb_obj.value;
+		var var_text = cb_obj.title;
+		console.log(value);
+		data['CH-1995-3'][2] = value
+		source.data = data
+		source.change.emit()
+		console.log(data['CH-1995-3'][2]);
 
-	# 	for (key in sdata) {console.log(key);}
+		
 
-	# 	if (f == "source") {
-	# 	for (key in sdata) {
-	# 		sdata[key].push(data1[key][i]);
-	# 		}
-	# 	}
+        var variable;
+		var value_idx;
+		// updatePlot(value, var_text); 
+        // socket.on('plot_update', function(msg) {
+        //    value = msg.new_value;
+        //     variable = msg.variable;
+		// 	value_idx = msg.index;
 
-	# 	source.trigger("change");
+		// 	console.log(value);
+		// 	console.log(value_idx);
+		// 	console.log(variable);
+		// 	values[value_idx] = value;
+		// 	data.values = values;
+		// 	source.data = data;
+		// 	source.change.emit();
+
+		// 	window.onmouseup = function() {
+		// 		updateModel(value, variable);
+		// 	}
+        // });
+	""")
+
+	# for slider in all_sliders:
+	active_1.js_on_change('value', callback)
+	# j_script = """
+	# 	# var f = cb_obj.value;
+	# 	# var sdata = source;
+	# 	# var back_value = slider.value;
+	# 	# var b = cb_obj.value;
+	# 	console.log('jsworking?')
+	# 	# console.log(sdata)
+	# 	# sdata['CH-1995-3'][2].push(b)
+	# 	# for (key in sdata) {
+	# 	# 	sdata[key].push(b);
+	# 	# }
+	# 	# console.log(source.data['CH-1995-3'][2])
+	# 	# source.change.emit();
 	# 	"""
+	# callback = CustomJS(args=dict(source=source), code=j_script)
+	# active_1.js_on_change('value', callback)
+	# active_1 = Slider(title=slider_1_value, value=source.data['CH-1995-3'][2], start=0, end=1, step=0.01, callback=callback)
 	# active_1.callback = CustomJS(args=dict(source=source),code=jvscript)
-
+	# def callback(source=source, window=None):
+	# 	data = source.data
+	# 	f = cb_obj.value
+	# 	data['CH-1995-3'][2] = f
+	# 	console.log(f)
+	# 	# x, y = data['x'], data['y']
+	# 	# for i in range(len(x)):
+	# 	# 	y[i] = window.Math.pow(x[i], f)
+	# 	source.change.emit()
+	# active_1 = Slider(title=slider_1_value, value=source.data['CH-1995-3'][2], start=0, end=1, step=0.01, callback=CustomJS.from_py_func(callback))
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
 	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, active_1, active_2, active_3])
