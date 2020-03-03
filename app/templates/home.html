@@ -14,17 +14,23 @@
 <!-- <p>{{data.year['CH-1995-1']}}</p>
     <p>{{data.year['Bloom']}}</p> -->
 
-<div class="all-grid">
-    <div class="left-grid">
-        {{l_script|safe }}
-        {{l_div|safe }}
-    </div>
 
-    <div class="right-grid">
+
+<div class=".container-fluid">
+  <div class="row">
+    <div class="col-lg-3" >
+        <div class="sidebar">
+                {{l_script|safe }}
+                {{l_div|safe }}
+        </div>
+    </div>
+    <div class="col-lg-2">
         {{r_script|safe }}
         {{r_div|safe }}
     </div>
-
+  </div>
+</div>
+<div class="all-grid">
 </div>
 
 

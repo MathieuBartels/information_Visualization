@@ -6,7 +6,8 @@ from flask import render_template, request, jsonify, send_from_directory
 from bokeh.plotting import output_file, figure
 from bokeh.embed import components
 from bokeh.layouts import row, column, widgetbox, layout, gridplot
-from bokeh.models import ColumnDataSource, Range1d,  CustomJS, Slider, HoverTool
+from bokeh.models import ColumnDataSource, Range1d,  CustomJS, Slider, HoverTool, OpenURL, TapTool
+
 
 from bokeh.io import output_file, show
 from bokeh.models.glyphs import Text
@@ -63,7 +64,7 @@ def home():
 	#Plot formatting
 	image_height = 1
 	image_width = 1
-	per_row = 10
+	per_row = 5
 	xr = per_row * image_width
 	yr = 220 / per_row * image_height
 
@@ -81,14 +82,21 @@ def home():
 		('Name', "@name"),
 		('Rank', "@rank"),
 		('Year', "@year"),
-		('Active Filter placeholder', "-")
+		('Active Filter placeholder', "@Public")
 	]
 
-	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=2000, plot_height=2000,tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
+	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=1000, plot_height=4000,tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
 	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
-	
+
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
+
+	callback = CustomJS(code="""console.log("whatever")""")
+
+	p.js_on_event('tap', callback)
 	
+	# url = "http://www.colors.commutercreative.com/@color/"
+	# taptool = p.select(type=TapTool)
+	# taptool.callback.CustomJS()
 	
 	#p.circle('x1', 'y1', size=20, source=data_source)
 
@@ -166,7 +174,7 @@ def home():
 	
 	active_text = PreText(text="Active Filters",width=200, height=40)
 
-	# All the slider modules
+	# All the sliderquad modules
 	active_1 = Slider(title=slider_1_value, value=sources.data[test_image][topic_to_idx[slider_1_value][0]], start=0, end=1, step=0.01)
 	active_2 = Slider(title=slider_2_value, value=sources.data[test_image][topic_to_idx[slider_2_value][0]], start=0, end=1, step=0.01)
 	active_3 = Slider(title=slider_3_value, value=sources.data[test_image][topic_to_idx[slider_3_value][0]], start=0, end=1, step=0.01)

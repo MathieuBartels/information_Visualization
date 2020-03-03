@@ -15,3 +15,11 @@
 .whole-grid::after{
     display: table;
 }
+
+.sidebar {
+    display: table-cell;
+    position: fixed;
+}
+.sidebar {
+    width: 330px;
+}
