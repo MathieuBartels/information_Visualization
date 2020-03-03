@@ -144,28 +144,28 @@ def home():
 	cb_myapproach = CheckboxGroup(labels=list(my_approach_data.index.values), active=[0, 1])
 	cb_contenttome = CheckboxGroup(labels=list(content_to_me_data.index.values), active=[0, 1])
 
-	button_to_checkbox = ColumnDataSource({'geography':cb_reality})
+	# button_to_checkbox = ColumnDataSource({'geography':['button']})
 
-	button_callback = CustomJS(args=dict(source=sources, btc= button_to_checkbox), code="""
-		//var data = source.data
+	# button_callback = CustomJS(args=dict(source=sources, btc= button_to_checkbox), code="""
+	# 	//var data = source.data
 
-		//var values = data["values"];
-		var value = cb_obj.value;
-		var title = cb_obj.title;
-		var checkboxgroup = btc[title];
-		for (let step = 0; step < 8, step++) {
-			var title = cb_obj.title;
-		}
+	# 	//var values = data["values"];
+	# 	var value = cb_obj.value;
+	# 	var title = cb_obj.title;
+	# 	var checkboxgroup = btc[title];
+	# 	for (let step = 0; step < 8, step++) {
+	# 		var title = cb_obj.title;
+	# 	}
 
-		//data[im_name][tti[var_text]] = value
-		//source.data = data
-		//source.change.emit()
-	""")
+	# 	//data[im_name][tti[var_text]] = value
+	# 	//source.data = data
+	# 	//source.change.emit()
+	# """)
 
 
-	all_buttons = [btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome]
-	for button in all_buttons:
-		button.js_on_change('value', button_callback)
+	# all_buttons = [btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome]
+	# for button in all_buttons:
+	# 	button.js_on_change('value', button_callback)
 
 	
 	# The names of the sub-catogory data instead of sources is the pandas df
