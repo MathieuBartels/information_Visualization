@@ -1,0 +1,10 @@
+.left-grid{
+    width: 20%;
+}
+
+.right-grid {
+    width: 80%;
+}
+.whole-grid::after{
+    display: table;
+}

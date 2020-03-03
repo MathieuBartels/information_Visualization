@@ -12,8 +12,7 @@ from bokeh.io import output_file, show
 from bokeh.models.glyphs import Text
 from bokeh.models.widgets import PreText
 from bokeh.models import Label
-from bokeh.models.widgets import Button, TextInput, Select
-
+from bokeh.models.widgets import Button, TextInput, Select, CheckboxGroup
 
 from app import app
 from app import image_plotting
@@ -117,14 +116,16 @@ def home():
 	r_square.xgrid.grid_line_color = None
 
 
-	btn_geography = Button(label="Geography", button_type="primary")
-	btn_reality = Button(label="Reality", button_type="danger")
-	btn_humanfactor = Button(label="Human Factor", button_type="warning")
-	btn_domains = Button(label="Domains", button_type="success")
-	btn_goals = Button(label="Goals", button_type="success")
-	btn_means = Button(label="Means", button_type="warning")
-	btn_myapproach = Button(label="My Approach", button_type="danger")
-	btn_contenttome = Button(label="Content To Me", button_type="primary")
+	btn_geography = Button(label="Geography", button_type="primary", width=150 )
+	btn_reality = Button(label="Reality", button_type="danger", width=150)
+	btn_humanfactor = Button(label="Human Factor", button_type="warning", width=150)
+	btn_domains = Button(label="Domains", button_type="success", width=150)
+	btn_goals = Button(label="Goals", button_type="success", width=150)
+	btn_means = Button(label="Means", button_type="warning", width=150)
+	btn_myapproach = Button(label="My Approach", button_type="danger", width=150)
+	btn_contenttome = Button(label="Content To Me", button_type="primary", width=150)
+
+
 
 	# TODO active sliders need to be created when a click happens on the image
 	# 1) click happens on image 2) top values of the image become active filters
@@ -138,6 +139,16 @@ def home():
 
 	# The names of the sub-catogory data instead of sources is the pandas df
 	sub_cat_names = human_factor_data.index.values
+
+	#cb_reality = CheckboxGroup(labels=['Private', 'Public', 'Interaction', 'Corporate', 'Politics'], active=[0, 1])
+	cb_reality = CheckboxGroup(labels=list(reality_data.index.values), active=[0, 1])
+	cb_geography = CheckboxGroup(labels=list(geography_data.index.values), active=[0, 1])
+	cb_humanfactor = CheckboxGroup(labels=list(human_factor_data.index.values), active=[0, 1])
+	cb_domains = CheckboxGroup(labels=list(domains_data.index.values), active=[0, 1])
+	cb_goals = CheckboxGroup(labels=list(goals_data.index.values), active=[0, 1])
+	cb_means = CheckboxGroup(labels=list(means_data.index.values), active=[0, 1])
+	cb_myapproach = CheckboxGroup(labels=list(my_approach_data.index.values), active=[0, 1])
+	cb_contenttome = CheckboxGroup(labels=list(content_to_me_data.index.values), active=[0, 1])
 
 	# TODO this needs to be an on-click image, now its just a random image
 	test_image = random.choice(list(data.naming_convention.keys()))
@@ -189,16 +200,27 @@ def home():
 	for slider in all_sliders:
 		slider.js_on_change('value', callback)
 
-	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
-	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, *all_sliders])
 
+
+	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
+	left_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, 
+	btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, *all_sliders])
+
+
+	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
+	#checkbox_grid = column([cb_reality])
+	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
+	cb_grid = column([cb_reality])
+	slider_grid= column([active_text, *all_sliders])
 	# define the components: the javascript used and the div
 	# grid = layout([[button_grid,p]])
-	left_grid = layout([[button_grid]])
+
+	left_grid = layout([[button_grid,cb_grid],[slider_grid]])
 	right_grid = layout([[p]])
 
+
 	l_script, l_div = components(left_grid)
-	r_script, r_div = components(right_grid)
+	r_script, r_div = components(p)
 
 	return render_template('home.html',
 		images=images, data=data, l_script=l_script, l_div=l_div, r_script=r_script, r_div=r_div)

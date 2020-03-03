@@ -1,19 +1,33 @@
 {% extends "base.html" %}
-{% block title %}  - NOWHERE {% endblock %}
+{% block title %} - NOWHERE {% endblock %}
 <!-- <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-0.12.0.min.js"></script>
 <script src="https://cdn.pydata.org/bokeh/release/bokeh-x.y.z.min.js"></script>
 <script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-x.y.z.min.js"></script>
 <script src="https://cdn.pydata.org/bokeh/release/bokeh-tables-x.y.z.min.js"></script> -->
+
+
+
 {{script}}
 {% block body %}
 
 <div id="view3" class="view3_2"></div>
-    <!-- <p>{{data.year['CH-1995-1']}}</p>
+<!-- <p>{{data.year['CH-1995-1']}}</p>
     <p>{{data.year['Bloom']}}</p> -->
-    {{l_script|safe }} 
-    {{l_div|safe }}
-    {{r_script|safe }} 
-    {{r_div|safe }}
-    <!-- {{ script|safe }}   
+
+<div class="all-grid">
+    <div class="left-grid">
+        {{l_script|safe }}
+        {{l_div|safe }}
+    </div>
+
+    <div class="right-grid">
+        {{r_script|safe }}
+        {{r_div|safe }}
+    </div>
+
+</div>
+
+
+<!-- {{ script|safe }}   
     {{ div|safe }} -->
 {% endblock %}
