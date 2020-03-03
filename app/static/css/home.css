@@ -1,10 +1,25 @@
+* {
+    box-sizing: border-box;
+  }
+
 .left-grid{
-    width: 20%;
+    float: left;
+    width: 200px;
 }
 
 .right-grid {
-    width: 80%;
+    float: left;
+    width: 600px;
 }
+
 .whole-grid::after{
     display: table;
+}
+
+.sidebar {
+    display: table-cell;
+    position: fixed;
+}
+.sidebar {
+    width: 330px;
 }
