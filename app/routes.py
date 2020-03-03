@@ -6,7 +6,7 @@ from flask import render_template, request, jsonify, send_from_directory
 from bokeh.plotting import output_file, figure
 from bokeh.embed import components
 from bokeh.layouts import row, column, widgetbox, layout, gridplot
-from bokeh.models import ColumnDataSource, Range1d,  CustomJS, Slider
+from bokeh.models import ColumnDataSource, Range1d,  CustomJS, Slider, HoverTool
 
 from bokeh.io import output_file, show
 from bokeh.models.widgets import Button, TextInput, Dropdown
@@ -58,11 +58,25 @@ def home():
 	df['h'] = [image_height] * 220
 	df['x1'] = (df['rank'] - 1) % per_row
 	df['y1'] = yr - (df['rank'] - 1) // per_row
+	df['x2'] = (df['rank'] - 1) % per_row + image_width
+	df['y2'] = yr - (df['rank'] - 1) // per_row - image_height
 	
-	data_source = ColumnDataSource(df)
+	data_source = ColumnDataSource(data=df)
 
-	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=2000, plot_height=2000, toolbar_location=None)
+	TOOLTIPS = [
+		('Name', "@name"),
+		('Rank', "@rank"),
+		('Year', "@year"),
+		('Active Filter placeholder', "-")
+	]
+
+	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=2000, plot_height=2000,tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
 	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
+	
+	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
+	
+	
+	#p.circle('x1', 'y1', size=20, source=data_source)
 
 
 	# images = os.listdir('app/static/230_works_1024x/')
