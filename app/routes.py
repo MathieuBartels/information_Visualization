@@ -123,18 +123,6 @@ def home():
 	r_square.axis.visible = False
 	r_square.xgrid.grid_line_color = None
 
-
-	btn_geography = Button(label="Geography", button_type="primary", width=150 )
-	btn_reality = Button(label="Reality", button_type="danger", width=150)
-	btn_humanfactor = Button(label="Human Factor", button_type="warning", width=150)
-	btn_domains = Button(label="Domains", button_type="success", width=150)
-	btn_goals = Button(label="Goals", button_type="success", width=150)
-	btn_means = Button(label="Means", button_type="warning", width=150)
-	btn_myapproach = Button(label="My Approach", button_type="danger", width=150)
-	btn_contenttome = Button(label="Content To Me", button_type="primary", width=150)
-
-
-
 	# TODO active sliders need to be created when a click happens on the image
 	# 1) click happens on image 2) top values of the image become active filters
 	# So this needs to communicate with the buttons which is not hard, and the subsubjects is also not hard
@@ -145,8 +133,14 @@ def home():
 	# only the first works because of the hard-coded sliders
 	sources = sources[0]
 
-	# The names of the sub-catogory data instead of sources is the pandas df
-	sub_cat_names = human_factor_data.index.values
+	btn_geography = Button(label="Geography", button_type="primary", width=150 )
+	btn_reality = Button(label="Reality", button_type="danger", width=150)
+	btn_humanfactor = Button(label="Human Factor", button_type="warning", width=150)
+	btn_domains = Button(label="Domains", button_type="success", width=150)
+	btn_goals = Button(label="Goals", button_type="success", width=150)
+	btn_means = Button(label="Means", button_type="warning", width=150)
+	btn_myapproach = Button(label="My Approach", button_type="danger", width=150)
+	btn_contenttome = Button(label="Content To Me", button_type="primary", width=150)
 
 	#cb_reality = CheckboxGroup(labels=['Private', 'Public', 'Interaction', 'Corporate', 'Politics'], active=[0, 1])
 	cb_reality = CheckboxGroup(labels=list(reality_data.index.values), active=[0, 1])
@@ -157,6 +151,35 @@ def home():
 	cb_means = CheckboxGroup(labels=list(means_data.index.values), active=[0, 1])
 	cb_myapproach = CheckboxGroup(labels=list(my_approach_data.index.values), active=[0, 1])
 	cb_contenttome = CheckboxGroup(labels=list(content_to_me_data.index.values), active=[0, 1])
+
+	# button_to_checkbox = ColumnDataSource({'geography':['button']})
+
+	# button_callback = CustomJS(args=dict(source=sources, btc= button_to_checkbox), code="""
+	# 	//var data = source.data
+
+	# 	//var values = data["values"];
+	# 	var value = cb_obj.value;
+	# 	var title = cb_obj.title;
+	# 	var checkboxgroup = btc[title];
+	# 	for (let step = 0; step < 8, step++) {
+	# 		var title = cb_obj.title;
+	# 	}
+
+	# 	//data[im_name][tti[var_text]] = value
+	# 	//source.data = data
+	# 	//source.change.emit()
+	# """)
+
+
+	# all_buttons = [btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome]
+	# for button in all_buttons:
+	# 	button.js_on_change('value', button_callback)
+
+	
+	# The names of the sub-catogory data instead of sources is the pandas df
+	sub_cat_names = human_factor_data.index.values
+
+	
 
 	# TODO this needs to be an on-click image, now its just a random image
 	test_image = random.choice(list(data.naming_convention.keys()))
@@ -222,16 +245,17 @@ def home():
 	slider_grid= column([active_text, *all_sliders])
 	# define the components: the javascript used and the div
 	# grid = layout([[button_grid,p]])
-
+	# page = row()
 	left_grid = layout([[button_grid,cb_grid],[slider_grid]])
 	right_grid = layout([[p]])
+	page = row(left_grid, right_grid)
 
 
-	l_script, l_div = components(left_grid)
-	r_script, r_div = components(p)
+	l_script, l_div = components(page)
+	# r_script, r_div = components(p)
 
 	return render_template('home.html',
-		images=images, data=data, l_script=l_script, l_div=l_div, r_script=r_script, r_div=r_div)
+		images=images, data=data, l_script=l_script, l_div=l_div)
 	# return render_template('view3.html', title='Welcome!')
 
 @app.route("/view2", methods = ['GET', 'POST'])
@@ -258,8 +282,8 @@ def view2():
 
 	# images = os.listdir('app/static/230_works_1024x/')
 	# urls = [f'/static/230_works_1024x/{image}' for image in images]
-	images = os.listdir('app/static/thumbnails/')
-	urls = [f'/static/thumbnails/{image}' for image in images]
+	images = os.listdir('app/static/230_works_1024x/')
+	urls = [f'/static/230_works_1024x/{image}' for image in images]
 	names = [image[:-4] for image in images]
 	image_to_source = {name : [source] for name, source in zip(names, urls)}
 
@@ -274,9 +298,10 @@ def view2():
 	y1 = np.linspace(0, yr, N+1)
 
 	#Greate figure
-	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=300, plot_height=500,toolbar_location=None)
-	for i, url in enumerate(image_selection):
-		p.image_url(url=url, x=x1[i % 15], y=i//15, w=xr/N, h=yr/N, source=data_source)
+	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=100, plot_height=100,toolbar_location=None)
+	# for i, url in enumerate(image_selection):
+	# 	p.image_url(url=url, x=x1[i % 15], y=i//15, w=xr/N, h=yr/N, source=data_source)
+	p.image_url(url=image_selection[11], x=1, y=9, w=5, h=5, source=data_source)
 
 	#Remove grid and axis
 	p.xgrid.visible = False
