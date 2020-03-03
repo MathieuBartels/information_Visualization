@@ -201,6 +201,12 @@ def home():
 		slider.js_on_change('value', callback)
 
 
+
+	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
+	left_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, 
+	btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, *all_sliders])
+
+
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
 	#checkbox_grid = column([cb_reality])
 	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
@@ -208,11 +214,13 @@ def home():
 	slider_grid= column([active_text, *all_sliders])
 	# define the components: the javascript used and the div
 	# grid = layout([[button_grid,p]])
+
 	left_grid = layout([[button_grid,cb_grid],[slider_grid]])
 	right_grid = layout([[p]])
 
+
 	l_script, l_div = components(left_grid)
-	r_script, r_div = components(right_grid)
+	r_script, r_div = components(p)
 
 	return render_template('home.html',
 		images=images, data=data, l_script=l_script, l_div=l_div, r_script=r_script, r_div=r_div)
