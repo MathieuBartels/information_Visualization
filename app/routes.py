@@ -84,7 +84,7 @@ def home():
 		('Active Filter placeholder', "-")
 	]
 
-	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=2000, plot_height=2000,tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
+	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=1000, plot_height=1000,tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
 	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
 	
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
@@ -214,16 +214,17 @@ def home():
 	slider_grid= column([active_text, *all_sliders])
 	# define the components: the javascript used and the div
 	# grid = layout([[button_grid,p]])
-
+	# page = row()
 	left_grid = layout([[button_grid,cb_grid],[slider_grid]])
 	right_grid = layout([[p]])
+	page = row(left_grid, right_grid)
 
 
-	l_script, l_div = components(left_grid)
-	r_script, r_div = components(p)
+	l_script, l_div = components(page)
+	# r_script, r_div = components(p)
 
 	return render_template('home.html',
-		images=images, data=data, l_script=l_script, l_div=l_div, r_script=r_script, r_div=r_div)
+		images=images, data=data, l_script=l_script, l_div=l_div)
 	# return render_template('view3.html', title='Welcome!')
 
 @app.route("/view2", methods = ['GET', 'POST'])
@@ -250,8 +251,8 @@ def view2():
 
 	# images = os.listdir('app/static/230_works_1024x/')
 	# urls = [f'/static/230_works_1024x/{image}' for image in images]
-	images = os.listdir('app/static/thumbnails/')
-	urls = [f'/static/thumbnails/{image}' for image in images]
+	images = os.listdir('app/static/230_works_1024x/')
+	urls = [f'/static/230_works_1024x/{image}' for image in images]
 	names = [image[:-4] for image in images]
 	image_to_source = {name : [source] for name, source in zip(names, urls)}
 
@@ -266,9 +267,10 @@ def view2():
 	y1 = np.linspace(0, yr, N+1)
 
 	#Greate figure
-	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=300, plot_height=500,toolbar_location=None)
-	for i, url in enumerate(image_selection):
-		p.image_url(url=url, x=x1[i % 15], y=i//15, w=xr/N, h=yr/N, source=data_source)
+	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=100, plot_height=100,toolbar_location=None)
+	# for i, url in enumerate(image_selection):
+	# 	p.image_url(url=url, x=x1[i % 15], y=i//15, w=xr/N, h=yr/N, source=data_source)
+	p.image_url(url=image_selection[11], x=1, y=9, w=5, h=5, source=data_source)
 
 	#Remove grid and axis
 	p.xgrid.visible = False
