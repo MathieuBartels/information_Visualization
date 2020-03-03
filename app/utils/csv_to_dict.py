@@ -57,14 +57,13 @@ class NOWHERE():
 
         self.year = {}
         self.geography = {}
-        self.reality = defaultdict(dict)
-        # self.human_factor = defaultdict(dict)
+        self.reality = defaultdict(list)
         self.human_factor = defaultdict(list) # columndata bokeh needs a list
-        self.domains = defaultdict(dict)
-        self.goals = defaultdict(dict)
-        self.means = defaultdict(dict)
-        self.my_approach = defaultdict(dict)
-        self.content_to_me = defaultdict(dict)
+        self.domains = defaultdict(list)
+        self.goals = defaultdict(list)
+        self.means = defaultdict(list)
+        self.my_approach = defaultdict(list)
+        self.content_to_me = defaultdict(list)
 
         self.naming_convention = {}
 
@@ -95,21 +94,41 @@ class NOWHERE():
                 means_l = i[67:90]
                 my_approaches_l = i[90:115]
                 contents_to_me_l = i[115:149]
+                # print(countries_l)
+                # print("reality items")
+                # print(reality_items_l)
+                # print("goals")
+                # print(goals_l)
+                # print("Domains")
+                # print(domains_l)
+                # print("means")
+                # print(means_l)
+                # print("my approaches")
+                # print(my_approaches_l)
+                # print("contents to me")
+                # print(contents_to_me_l)
                 continue
             if enum == 1:
                 continue
+            
+            self.year[i[0]] = [i[1]]
 
-            self.year[i[0]] = i[1]
-
-            self.geography[i[0]] = countries_l[int(i[2:7].index(str(1)))]
+            self.geography[i[0]] = [countries_l[int(i[2:7].index(str(1)))]]
             
             for column_val, ri in enumerate(reality_items_l):
                 if i[column_val + 7] != "":
                     # ValueError if some are empty 
-                    try:
-                        self.reality[i[0]][ri] = float(i[column_val + 7])
+                    try: 
+                        self.reality[i[0]].append(float(i[column_val + 7]))
                     except:
+                        self.reality[i[0]].append(float(0))
                         continue
+                    # try:
+                    #     self.reality[i[0]][ri] = float(i[column_val + 7])
+                    # except:
+                    #     continue
+                else:
+                    self.reality[i[0]].append(float(0))
             
             for column_val, ri in enumerate(human_factors_l):
                 if i[column_val + 28] != "":
@@ -128,38 +147,73 @@ class NOWHERE():
             for column_val, ri in enumerate(domains_l):
                 if i[column_val + 33] != "":
                     try:
-                        self.domains[i[0]][ri] = float(i[column_val + 33])
+                        self.domains[i[0]].append(float(i[column_val + 33]))
                     except:
+                        self.domains[i[0]].append(float(0))
                         continue
+                    # try:
+                    #     self.domains[i[0]][ri] = float(i[column_val + 33])
+                    # except:
+                    #     continue
+                else:
+                    self.domains[i[0]].append(float(0))
             
             for column_val, ri in enumerate(goals_l):
                 if i[column_val + 48] != "":
                     try:
-                        self.goals[i[0]][ri] = float(i[column_val + 48])
+                        self.goals[i[0]].append(float(i[column_val + 48]))
                     except:
+                        self.goals[i[0]].append(float(0))
                         continue
+                    # try:
+                    #     self.goals[i[0]][ri] = float(i[column_val + 48])
+                    # except:
+                    #     continue
+                else:
+                    self.goals[i[0]].append(float(0))
             
             for column_val, ri in enumerate(means_l):
                 if i[column_val + 67] != "":
-                    try:
-                        self.goals[i[0]][ri] = float(i[column_val + 67])
+                    try: 
+                        self.means[i[0]].append(float(i[column_val + 67]))
                     except:
+                        self.means[i[0]].append(float(0))
                         continue
+                    # try:
+                    #     self.goals[i[0]][ri] = float(i[column_val + 67])
+                    # except:
+                    #     continue
+                else:
+                    self.means[i[0]].append(float(0))
 
             for column_val, ri in enumerate(my_approaches_l):
-                    if i[column_val + 90] != "":
-                        try:
-                            self.my_approach[i[0]][ri] = float(i[column_val + 90])
-                        except:
-                            continue
+                if i[column_val + 90] != "":
+                    try:
+                        self.my_approach[i[0]].append(float(i[column_val + 90]))
+                    except:
+                        self.my_approach[i[0]].append(float(0))
+                        continue
+                    # try:
+                    #     self.my_approach[i[0]][ri] = float(i[column_val + 90])
+                    # except:
+                    #     continue
+                else:
+                    self.my_approach[i[0]].append(float(0))
             
             for column_val, ri in enumerate(contents_to_me_l):
-                    if i[column_val + 115] != "":
-                        try:
-                            self.content_to_me[i[0]][ri] = float(i[column_val + 115])
-                        except:
-                            continue
-        
+                if i[column_val + 115] != "":
+                    try:
+                        self.content_to_me[i[0]].append(float(i[column_val + 115]))
+                    except:
+                        self.content_to_me[i[0]].append(float(0))
+                        continue
+                    # try:
+                    #     self.content_to_me[i[0]][ri] = float(i[column_val + 115])
+                    # except:
+                    #     continue
+                else:
+                    self.content_to_me[i[0]].append(float(0))
+    
         print("Dictionaries filled")
 
 nowhere_metadata = NOWHERE()
