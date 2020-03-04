@@ -1,6 +1,6 @@
 import os, json
 import random
-from bokeh.events import ButtonClick
+from bokeh.events import ButtonClick, Tap, Press
 from flask import render_template, request, jsonify, send_from_directory
 
 from bokeh.plotting import output_file, figure
@@ -21,6 +21,9 @@ from app.utils.csv_to_dict import nowhere_metadata
 from decimal import Decimal
 import pandas as pd
 import numpy as np
+
+
+
 
 @app.route('/', methods = ['GET', 'POST'])
 @app.route('/home', methods = ['GET', 'POST'])
@@ -65,6 +68,7 @@ def home():
 	image_height = 1
 	image_width = 1
 	per_row = 5
+	rows = 220/5
 	xr = per_row * image_width
 	yr = 220 / per_row * image_height
 
@@ -90,15 +94,22 @@ def home():
 
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
 
-	callback = CustomJS(code="""console.log("whatever")""")
+    
 
-	p.js_on_event('tap', callback)
-	
-	# url = "http://www.colors.commutercreative.com/@color/"
-	# taptool = p.select(type=TapTool)
-	# taptool.callback.CustomJS()
-	
-	#p.circle('x1', 'y1', size=20, source=data_source)
+	p.js_on_event(Tap, CustomJS(args=dict(data=data_source.data, per_row=per_row, rows=rows), code="""
+
+		const getKey = (obj,val) => Object.keys(obj).find(key => obj[key] === val);
+
+		let x = Math.ceil(cb_obj.x);
+		let y = Math.ceil(cb_obj.y);
+
+		let data_rank = (rows - y) * per_row + x
+		
+		let data_index = getKey(data['rank'], data_rank)
+
+		window.location.href = '/view2/' + data['name'][data_index]; //relative to domain
+
+	"""))
 
 	#Remove grid and axis
 	p.xgrid.visible = False
@@ -248,19 +259,36 @@ def home():
 	# page = row()
 	left_grid = layout([[button_grid,cb_grid],[slider_grid]])
 	right_grid = layout([[p]])
-	page = row(left_grid, right_grid)
 
 
-	l_script, l_div = components(page)
-	# r_script, r_div = components(p)
+	l_script, l_div = components(left_grid)
+	r_script, r_div = components(right_grid)
 
 	return render_template('home.html',
-		images=images, data=data, l_script=l_script, l_div=l_div)
+		images=images, data=data, l_script=l_script, l_div=l_div, r_script=r_script, r_div=r_div)
 	# return render_template('view3.html', title='Welcome!')
 
-@app.route("/view2", methods = ['GET', 'POST'])
-def view2():
+@app.route("/view2/<image_name>", methods = ['GET', 'POST'])
+def view2(image_name):
 	data = nowhere_metadata
+
+	df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
+	header = df.iloc[2]
+	df = pd.DataFrame(df.values[4:], columns=header)
+	df.rename(columns={'1= very related': 'name'}, inplace=True)
+	df.columns.values[1] = "year"	
+	df.fillna(0, inplace=True)
+	df.sort_values(by=['name'], inplace=True)
+	df['rank'] = range(1, 221)
+	
+	#Get urls of the images and add to the dataframe
+	images = os.listdir('app/static/230_works_1024x')
+	images = images[0:220]
+	urls = [f'/static/230_works_1024x/{image}' for image in images]
+	df['urls'] = urls
+	
+	image_data_row = df[df['name']==image_name]
+	print(image_data_row)
 	
 	human_factor_data = pd.DataFrame(dict(data.human_factor), index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction']) 
 	geography_data = pd.DataFrame(dict(data.geography), index=['Europe', 'Nrth America', 'Middle East', 'Asia', 'Sth America'])
@@ -280,28 +308,9 @@ def view2():
 	my_approach_sources = ColumnDataSource(data=my_approach_data)
 	content_to_me_sources = ColumnDataSource(data=content_to_me_data)
 
-	# images = os.listdir('app/static/230_works_1024x/')
-	# urls = [f'/static/230_works_1024x/{image}' for image in images]
-	images = os.listdir('app/static/230_works_1024x/')
-	urls = [f'/static/230_works_1024x/{image}' for image in images]
-	names = [image[:-4] for image in images]
-	image_to_source = {name : [source] for name, source in zip(names, urls)}
-
-
-	data_source = ColumnDataSource(image_to_source)
-
-	image_selection = names # TODO make this selection more fancy and maybe dynamic
-	N = min(len(image_selection), 15)
-	xr = 10
-	yr = 10
-	x1 = np.linspace(0, xr, N+1)
-	y1 = np.linspace(0, yr, N+1)
-
 	#Greate figure
-	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=100, plot_height=100,toolbar_location=None)
-	# for i, url in enumerate(image_selection):
-	# 	p.image_url(url=url, x=x1[i % 15], y=i//15, w=xr/N, h=yr/N, source=data_source)
-	p.image_url(url=image_selection[11], x=1, y=9, w=5, h=5, source=data_source)
+	p = figure(x_range=(0,10), y_range=(0,10), plot_width=20, plot_height=20,toolbar_location=None)
+	p.image_url(url=image_data_row['urls'], x=2.5, y=8, w=5, h=5)
 
 	#Remove grid and axis
 	p.xgrid.visible = False
