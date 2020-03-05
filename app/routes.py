@@ -235,10 +235,10 @@ def home():
 		const y_range = 220 / per_row * image_height
 
 		source["data"]['x1'] = source["data"]['rank'].map(value => (value - 1) % per_row)
-		source["data"]['y1'] = source["data"]['rank'].map(value => y_range - ((value - 1) // per_row))
+		source["data"]['y1'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row))
 		source["data"]['x2'] = source["data"]['rank'].map(value => (value - 1) % per_row + image_width) 
-		source["data"]['y2'] = source["data"]['rank'].map(value => y_range - ((value - 1) // per_row) - image_height) 
-
+		source["data"]['y2'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
+		
 		source.change.emit()
 	""")
 
