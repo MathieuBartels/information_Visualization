@@ -8,7 +8,6 @@ from bokeh.embed import components
 from bokeh.layouts import row, column, widgetbox, layout, gridplot
 from bokeh.models import ColumnDataSource, Range1d,  CustomJS, Slider, HoverTool, OpenURL, TapTool
 
-
 from bokeh.io import output_file, show
 from bokeh.models.glyphs import Text
 from bokeh.models.widgets import PreText
@@ -21,8 +20,6 @@ from app.utils.csv_to_dict import nowhere_metadata
 from decimal import Decimal
 import pandas as pd
 import numpy as np
-
-
 
 
 @app.route('/', methods = ['GET', 'POST'])
@@ -69,16 +66,16 @@ def home():
 	image_width = 1
 	per_row = 5
 	rows = 220/5
-	xr = per_row * image_width
-	yr = 220 / per_row * image_height
+	x_range = per_row * image_width
+	y_range = 220 / per_row * image_height
 
 	#Add columns to the dataframe for the placing and formatting
 	df['w'] = [image_width] * 220
 	df['h'] = [image_height] * 220
 	df['x1'] = (df['rank'] - 1) % per_row
-	df['y1'] = yr - (df['rank'] - 1) // per_row
+	df['y1'] = y_range - (df['rank'] - 1) // per_row
 	df['x2'] = (df['rank'] - 1) % per_row + image_width
-	df['y2'] = yr - (df['rank'] - 1) // per_row - image_height
+	df['y2'] = y_range - (df['rank'] - 1) // per_row - image_height
 	
 	data_source = ColumnDataSource(data=df)
 
@@ -89,7 +86,7 @@ def home():
 		('Active Filter placeholder', "@Public")
 	]
 
-	p = figure(x_range=(0,xr), y_range=(0,yr), plot_width=1000, plot_height=4000,tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
+	p = figure(x_range=(0, x_range), y_range=(0, y_range), plot_width=1000, plot_height=4000, tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
 	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
 
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
@@ -153,38 +150,15 @@ def home():
 	btn_myapproach = Button(label="My Approach", button_type="danger", width=150)
 	btn_contenttome = Button(label="Content To Me", button_type="primary", width=150)
 
-	#cb_reality = CheckboxGroup(labels=['Private', 'Public', 'Interaction', 'Corporate', 'Politics'], active=[0, 1])
-	cb_reality = CheckboxGroup(labels=list(reality_data.index.values), active=[0, 1])
-	cb_geography = CheckboxGroup(labels=list(geography_data.index.values), active=[0, 1])
-	cb_humanfactor = CheckboxGroup(labels=list(human_factor_data.index.values), active=[0, 1])
-	cb_domains = CheckboxGroup(labels=list(domains_data.index.values), active=[0, 1])
-	cb_goals = CheckboxGroup(labels=list(goals_data.index.values), active=[0, 1])
-	cb_means = CheckboxGroup(labels=list(means_data.index.values), active=[0, 1])
-	cb_myapproach = CheckboxGroup(labels=list(my_approach_data.index.values), active=[0, 1])
-	cb_contenttome = CheckboxGroup(labels=list(content_to_me_data.index.values), active=[0, 1])
 
-	# button_to_checkbox = ColumnDataSource({'geography':['button']})
-
-	# button_callback = CustomJS(args=dict(source=sources, btc= button_to_checkbox), code="""
-	# 	//var data = source.data
-
-	# 	//var values = data["values"];
-	# 	var value = cb_obj.value;
-	# 	var title = cb_obj.title;
-	# 	var checkboxgroup = btc[title];
-	# 	for (let step = 0; step < 8, step++) {
-	# 		var title = cb_obj.title;
-	# 	}
-
-	# 	//data[im_name][tti[var_text]] = value
-	# 	//source.data = data
-	# 	//source.change.emit()
-	# """)
-
-
-	# all_buttons = [btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome]
-	# for button in all_buttons:
-	# 	button.js_on_change('value', button_callback)
+	cb_reality = CheckboxGroup(labels=list(reality_data.index.values))
+	cb_geography = CheckboxGroup(labels=list(geography_data.index.values))
+	cb_humanfactor = CheckboxGroup(labels=list(human_factor_data.index.values))
+	cb_domains = CheckboxGroup(labels=list(domains_data.index.values))
+	cb_goals = CheckboxGroup(labels=list(goals_data.index.values))
+	cb_means = CheckboxGroup(labels=list(means_data.index.values))
+	cb_myapproach = CheckboxGroup(labels=list(my_approach_data.index.values))
+	cb_contenttome = CheckboxGroup(labels=list(content_to_me_data.index.values))
 
 	
 	# The names of the sub-catogory data instead of sources is the pandas df
@@ -209,11 +183,11 @@ def home():
 	active_text = PreText(text="Active Filters",width=200, height=40)
 
 	# All the sliderquad modules
-	active_1 = Slider(title=slider_1_value, value=sources.data[test_image][topic_to_idx[slider_1_value][0]], start=0, end=1, step=0.01)
-	active_2 = Slider(title=slider_2_value, value=sources.data[test_image][topic_to_idx[slider_2_value][0]], start=0, end=1, step=0.01)
-	active_3 = Slider(title=slider_3_value, value=sources.data[test_image][topic_to_idx[slider_3_value][0]], start=0, end=1, step=0.01)
-	active_4 = Slider(title=slider_4_value, value=sources.data[test_image][topic_to_idx[slider_4_value][0]], start=0, end=1, step=0.01) 
-	active_5 = Slider(title=slider_5_value, value=sources.data[test_image][topic_to_idx[slider_5_value][0]], start=0, end=1, step=0.01)
+	active_1 = Slider(title=slider_1_value, value=0, start=0, end=1, step=0.01)
+	active_2 = Slider(title=slider_2_value, value=0, start=0, end=1, step=0.01)
+	active_3 = Slider(title=slider_3_value, value=0, start=0, end=1, step=0.01)
+	active_4 = Slider(title=slider_4_value, value=0, start=0, end=1, step=0.01) 
+	active_5 = Slider(title=slider_5_value, value=0, start=0, end=1, step=0.01)
 
 	# leave this after the sliders because this thing is not a dict
 	topic_to_idx = ColumnDataSource(topic_to_idx)
@@ -224,25 +198,81 @@ def home():
 	# create a list of the active sliders
 	all_sliders = [active_1, active_2, active_3, active_4, active_5]
 
-	callback = CustomJS(args=dict(source=sources, tti=topic_to_idx, current_image=current_im), code="""
-		var data = source.data
-		var tti = tti.data
-		var im_name = current_image.data['im'][0]
+	# copy_data_source = ColumnDataSource(data=df)
 
-		var values = data["values"];
-		var value = cb_obj.value;
-		var var_text = cb_obj.title;
+	callback = CustomJS(args=dict(source=data_source, sliders=all_sliders, image_height=image_height, image_width=image_width, per_row=per_row, rows=rows), code="""
+		source_data = source["data"]
 
-		data[im_name][tti[var_text]] = value
-		source.data = data
+		// subtraction function where we subtract a value from an array
+		const subtract = function(array, value) {return array.map( array_at_i => array_at_i -value)}
+
+		// slider array values
+		const slider_array = sliders.map(slider => slider['properties']['value']['spec']['value']);
+		// slider array names
+		const slider_idx_to_name = sliders.map(slider => slider['attributes']['title']);
+
+		// source data for all images
+		const source_vectors = slider_idx_to_name.map(name => source_data[name]);
+
+		// for each row of features subtract the slider value
+		const subtracted_feature_matrix = source_vectors.map(function(v, i) { return subtract(v,  slider_array[i])});
+
+		var scores = new Array(220)
+		for (i = 0; i < 220; i++) {
+			scores[i] = Math.abs(subtracted_feature_matrix.map(value => value[i]).reduce((a,b) => a+b, 0))
+		} 
+
+		indexedScores = scores.map(function(e,i){return {ind: i, val: e}});
+		// sort index/value couples, based on values
+		indexedScores.sort(function(x, y){return x.val > y.val ? 1 : x.val == y.val ? 0 : -1});
+		// make list keeping only indices
+		const rank = indexedScores.map(function(e){return e.ind + 1});
+
+		source["data"]['rank'] = rank 
+		source["data"]["x1"] = rank
+
+		const x_range = per_row * image_width
+		const y_range = 220 / per_row * image_height
+
+		source["data"]['x1'] = source["data"]['rank'].map(value => (value - 1) % per_row)
+		source["data"]['y1'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row))
+		source["data"]['x2'] = source["data"]['rank'].map(value => (value - 1) % per_row + image_width) 
+		source["data"]['y2'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
+		
 		source.change.emit()
-		console.log(data[im_name][tti[var_text]]);
 	""")
 
 	for slider in all_sliders:
 		slider.js_on_change('value', callback)
 
 
+	#Grid of checkbox buttons. Had to be before callback to make it work.
+	cb_grid = column([cb_geography, cb_reality, cb_humanfactor, cb_domains, cb_goals, cb_means, cb_myapproach, cb_contenttome])
+	cb_grid.visible = False
+
+	#list of buttons and checkbox for for-loop callback
+	button_col = [btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome]
+	cb_col = [cb_geography, cb_reality, cb_humanfactor, cb_domains, cb_goals, cb_means, cb_myapproach, cb_contenttome]
+
+	#Callback Javascript code for buttons
+	code = """
+		grid.visible=true;
+		cb_geography.visible=false;
+		cb_reality.visible=false;
+		cb_humanfactor.visible=false;
+		cb_domains.visible=false;
+		cb_goals.visible=false;
+		cb_means.visible=false;
+		cb_myapproach.visible=false;
+		cb_contenttome.visible=false;
+		cb.visible=true;
+		"""
+
+	for button, cb in zip(button_col, cb_col):
+		button.js_on_click(CustomJS(args=dict(button=button,cb=cb,cb_reality=cb_reality,cb_geography=cb_geography,
+											  cb_humanfactor=cb_humanfactor, cb_domains=cb_domains, cb_goals=cb_goals,
+											  cb_means=cb_means, cb_myapproach=cb_myapproach, cb_contenttome=cb_contenttome,
+											  grid=cb_grid), code=code))
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
 	left_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, 
@@ -252,7 +282,7 @@ def home():
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
 	#checkbox_grid = column([cb_reality])
 	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
-	cb_grid = column([cb_reality])
+
 	slider_grid= column([active_text, *all_sliders])
 	# define the components: the javascript used and the div
 	# grid = layout([[button_grid,p]])
@@ -260,12 +290,16 @@ def home():
 	left_grid = layout([[button_grid,cb_grid],[slider_grid]])
 	right_grid = layout([[p]])
 
+	total_grid = layout([left_grid, right_grid])
 
-	l_script, l_div = components(left_grid)
-	r_script, r_div = components(right_grid)
+
+	# l_script, l_div = components(left_grid)
+	# r_script, r_div = components(right_grid)
+
+	script, div = components(total_grid)
 
 	return render_template('home.html',
-		images=images, data=data, l_script=l_script, l_div=l_div, r_script=r_script, r_div=r_div)
+		images=images, data=data, r_script=script, r_div=div)
 	# return render_template('view3.html', title='Welcome!')
 
 @app.route("/view2/<image_name>", methods = ['GET', 'POST'])
@@ -389,6 +423,7 @@ def view2(image_name):
 		data[im_name][tti[var_text]] = value
 		source.data = data
 		source.change.emit()
+
 		console.log(data[im_name][tti[var_text]]);
 	""")
 
