@@ -153,38 +153,15 @@ def home():
 	btn_myapproach = Button(label="My Approach", button_type="danger", width=150)
 	btn_contenttome = Button(label="Content To Me", button_type="primary", width=150)
 
-	#cb_reality = CheckboxGroup(labels=['Private', 'Public', 'Interaction', 'Corporate', 'Politics'], active=[0, 1])
-	cb_reality = CheckboxGroup(labels=list(reality_data.index.values), active=[0, 1])
-	cb_geography = CheckboxGroup(labels=list(geography_data.index.values), active=[0, 1])
-	cb_humanfactor = CheckboxGroup(labels=list(human_factor_data.index.values), active=[0, 1])
-	cb_domains = CheckboxGroup(labels=list(domains_data.index.values), active=[0, 1])
-	cb_goals = CheckboxGroup(labels=list(goals_data.index.values), active=[0, 1])
-	cb_means = CheckboxGroup(labels=list(means_data.index.values), active=[0, 1])
-	cb_myapproach = CheckboxGroup(labels=list(my_approach_data.index.values), active=[0, 1])
-	cb_contenttome = CheckboxGroup(labels=list(content_to_me_data.index.values), active=[0, 1])
 
-	# button_to_checkbox = ColumnDataSource({'geography':['button']})
-
-	# button_callback = CustomJS(args=dict(source=sources, btc= button_to_checkbox), code="""
-	# 	//var data = source.data
-
-	# 	//var values = data["values"];
-	# 	var value = cb_obj.value;
-	# 	var title = cb_obj.title;
-	# 	var checkboxgroup = btc[title];
-	# 	for (let step = 0; step < 8, step++) {
-	# 		var title = cb_obj.title;
-	# 	}
-
-	# 	//data[im_name][tti[var_text]] = value
-	# 	//source.data = data
-	# 	//source.change.emit()
-	# """)
-
-
-	# all_buttons = [btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome]
-	# for button in all_buttons:
-	# 	button.js_on_change('value', button_callback)
+	cb_reality = CheckboxGroup(labels=list(reality_data.index.values))
+	cb_geography = CheckboxGroup(labels=list(geography_data.index.values))
+	cb_humanfactor = CheckboxGroup(labels=list(human_factor_data.index.values))
+	cb_domains = CheckboxGroup(labels=list(domains_data.index.values))
+	cb_goals = CheckboxGroup(labels=list(goals_data.index.values))
+	cb_means = CheckboxGroup(labels=list(means_data.index.values))
+	cb_myapproach = CheckboxGroup(labels=list(my_approach_data.index.values))
+	cb_contenttome = CheckboxGroup(labels=list(content_to_me_data.index.values))
 
 	
 	# The names of the sub-catogory data instead of sources is the pandas df
@@ -242,6 +219,33 @@ def home():
 	for slider in all_sliders:
 		slider.js_on_change('value', callback)
 
+	#Grid of checkbox buttons. Had to be before callback to make it work.
+	cb_grid = column([cb_geography, cb_reality, cb_humanfactor, cb_domains, cb_goals, cb_means, cb_myapproach, cb_contenttome])
+	cb_grid.visible = False
+
+	#list of buttons and checkbox for for-loop callback
+	button_col = [btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome]
+	cb_col = [cb_geography, cb_reality, cb_humanfactor, cb_domains, cb_goals, cb_means, cb_myapproach, cb_contenttome]
+
+	#Callback Javascript code for buttons
+	code = """
+		grid.visible=true;
+		cb_geography.visible=false;
+		cb_reality.visible=false;
+		cb_humanfactor.visible=false;
+		cb_domains.visible=false;
+		cb_goals.visible=false;
+		cb_means.visible=false;
+		cb_myapproach.visible=false;
+		cb_contenttome.visible=false;
+		cb.visible=true;
+		"""
+
+	for button, cb in zip(button_col, cb_col):
+		button.js_on_click(CustomJS(args=dict(button=button,cb=cb,cb_reality=cb_reality,cb_geography=cb_geography,
+											  cb_humanfactor=cb_humanfactor, cb_domains=cb_domains, cb_goals=cb_goals,
+											  cb_means=cb_means, cb_myapproach=cb_myapproach, cb_contenttome=cb_contenttome,
+											  grid=cb_grid), code=code))
 
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
@@ -252,7 +256,7 @@ def home():
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
 	#checkbox_grid = column([cb_reality])
 	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
-	cb_grid = column([cb_reality])
+
 	slider_grid= column([active_text, *all_sliders])
 	# define the components: the javascript used and the div
 	# grid = layout([[button_grid,p]])
