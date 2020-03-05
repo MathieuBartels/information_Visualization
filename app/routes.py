@@ -200,7 +200,7 @@ def home():
 
 	# copy_data_source = ColumnDataSource(data=df)
 
-	callback = CustomJS(args=dict(source=data_source, sliders=all_sliders), code="""
+	callback = CustomJS(args=dict(source=data_source, sliders=all_sliders, image_height=image_height, image_width=image_width, per_row=per_row, rows=rows), code="""
 		source_data = source["data"]
 
 		// subtraction function where we subtract a value from an array
@@ -231,11 +231,48 @@ def home():
 		source["data"]['rank'] = rank 
 		source["data"]["x1"] = rank
 
+		const x_range = per_row * image_width
+		const y_range = 220 / per_row * image_height
+
+		source["data"]['x1'] = source["data"]['rank'].map(value => (value - 1) % per_row)
+		source["data"]['y1'] = source["data"]['rank'].map(value => y_range - ((value - 1) // per_row))
+		source["data"]['x2'] = source["data"]['rank'].map(value => (value - 1) % per_row + image_width) 
+		source["data"]['y2'] = source["data"]['rank'].map(value => y_range - ((value - 1) // per_row) - image_height) 
+
 		source.change.emit()
 	""")
 
 	for slider in all_sliders:
 		slider.js_on_change('value', callback)
+
+
+	#Grid of checkbox buttons. Had to be before callback to make it work.
+	cb_grid = column([cb_geography, cb_reality, cb_humanfactor, cb_domains, cb_goals, cb_means, cb_myapproach, cb_contenttome])
+	cb_grid.visible = False
+
+	#list of buttons and checkbox for for-loop callback
+	button_col = [btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome]
+	cb_col = [cb_geography, cb_reality, cb_humanfactor, cb_domains, cb_goals, cb_means, cb_myapproach, cb_contenttome]
+
+	#Callback Javascript code for buttons
+	code = """
+		grid.visible=true;
+		cb_geography.visible=false;
+		cb_reality.visible=false;
+		cb_humanfactor.visible=false;
+		cb_domains.visible=false;
+		cb_goals.visible=false;
+		cb_means.visible=false;
+		cb_myapproach.visible=false;
+		cb_contenttome.visible=false;
+		cb.visible=true;
+		"""
+
+	for button, cb in zip(button_col, cb_col):
+		button.js_on_click(CustomJS(args=dict(button=button,cb=cb,cb_reality=cb_reality,cb_geography=cb_geography,
+											  cb_humanfactor=cb_humanfactor, cb_domains=cb_domains, cb_goals=cb_goals,
+											  cb_means=cb_means, cb_myapproach=cb_myapproach, cb_contenttome=cb_contenttome,
+											  grid=cb_grid), code=code))
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
 	left_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, 
