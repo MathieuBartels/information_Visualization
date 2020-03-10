@@ -1,6 +1,6 @@
 import os, json
 import random
-from bokeh.events import ButtonClick, Tap, Press
+from bokeh.events import ButtonClick, Tap, Press, MouseMove
 from flask import render_template, request, jsonify, send_from_directory
 
 from bokeh.plotting import output_file, figure
@@ -84,12 +84,22 @@ def home():
 		('Active Filter placeholder', "@Public")
 	]
 
-	p = figure(x_range=(0, x_range), y_range=(0, y_range), plot_width=1000, plot_height=4000, tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
+
+	p = figure(x_range=(0, x_range), y_range=(0, y_range), plot_width=1000, plot_height=4000, tools='hover, wheel_zoom', toolbar_location=None)
 	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
 
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
 
     
+	p.js_on_event(MouseMove, CustomJS(args=dict(data=data_source.data, per_row=per_row, rows=rows), code="""
+		let x = Math.ceil(cb_obj.x);
+		let y = Math.ceil(cb_obj.y);
+
+		console.log(x, y);
+
+
+	"""))
+
 
 	p.js_on_event(Tap, CustomJS(args=dict(data=data_source.data, per_row=per_row, rows=rows), code="""
 
@@ -193,6 +203,8 @@ def home():
 
 	callback = CustomJS(args=dict(source=data_source, sliders=all_sliders, image_height=image_height, image_width=image_width, per_row=per_row, rows=rows), code="""
 		source_data = source["data"]
+
+		console.log(sliders);
 
 		// subtraction function where we subtract a value from an array
 		const subtract = function(array, value) {return array.map( array_at_i => array_at_i -value)}
