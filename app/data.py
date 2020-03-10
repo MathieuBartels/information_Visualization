@@ -9,11 +9,13 @@ df.rename(columns={'1= very related': 'name'}, inplace=True)
 df.columns.values[1] = "year"	
 df.fillna(0, inplace=True)
 df.sort_values(by=['name'], inplace=True)
-df['rank'] = range(1, 221)
+
+image_amount = len(df)
+df['rank'] = range(1, image_amount+1)
 
 #Get urls of the images and add to the dataframe
 images = os.listdir('app/static/230_works_1024x')
-images = images[0:220]
+images = images[0:image_amount]
 urls = [f'/static/230_works_1024x/{image}' for image in images]
 df['urls'] = urls
 
@@ -21,13 +23,13 @@ df['urls'] = urls
 image_height = 1
 image_width = 1
 per_row = 5
-rows = 220/5
+rows = image_amount/5
 x_range = per_row * image_width
-y_range = 220 / per_row * image_height
+y_range = image_amount / per_row * image_height
 
 #Add columns to the dataframe for the placing and formatting
-df['w'] = [image_width] * 220
-df['h'] = [image_height] * 220
+df['w'] = [image_width] * image_amount
+df['h'] = [image_height] * image_amount
 df['x1'] = (df['rank'] - 1) % per_row
 df['y1'] = y_range - (df['rank'] - 1) // per_row
 df['x2'] = (df['rank'] - 1) % per_row + image_width
