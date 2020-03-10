@@ -198,7 +198,7 @@ def home():
 	# test_image = random.choice(list(data.naming_convention.keys()))
 
 	sl_geo = {}
-	slider_geo_index = geography_data.index.values
+	slider_geo_index = geography_data.columns
 
 	for sliders in slider_geo_index:
 		sl_geo[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
