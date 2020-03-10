@@ -169,7 +169,16 @@ def home():
 	# TODO this needs to be an on-click image, now its just a random image
 	test_image = random.choice(list(data.naming_convention.keys()))
 	print(test_image)
-	
+
+	sl_geo = {}
+	slider_geo_index = geography_data.index.values
+
+	for sliders in slider_geo_index:
+		sl_geo[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
+		sl_geo[sliders].visible = False
+
+	print(list(sl_geo.values()))
+
 	# TODO Make these active filters interactive with click on the image
 	slider_1_value = 'Private'
 	slider_2_value = "Public"
@@ -255,7 +264,7 @@ def home():
 	cb_col = [cb_geography, cb_reality, cb_humanfactor, cb_domains, cb_goals, cb_means, cb_myapproach, cb_contenttome]
 
 	#Callback Javascript code for buttons
-	code = """
+	code_button = """
 		grid.visible=true;
 		cb_geography.visible=false;
 		cb_reality.visible=false;
@@ -268,11 +277,35 @@ def home():
 		cb.visible=true;
 		"""
 
+	code_cb = """
+		
+		var slider = slider;
+		var label = cb_obj.active.map(i=>cb_obj.labels[i])
+
+		for(i=0;i<cb_obj.labels.length;i++)
+		{
+			if(label.includes(cb_obj.labels[i]))
+			{
+			slider[cb_obj.labels[i]].visible=true;
+			}
+		
+			else
+			{
+			slider[cb_obj.labels[i]].visible=false;
+			}
+		}
+	
+		
+		"""
+
 	for button, cb in zip(button_col, cb_col):
 		button.js_on_click(CustomJS(args=dict(button=button,cb=cb,cb_reality=cb_reality,cb_geography=cb_geography,
 											  cb_humanfactor=cb_humanfactor, cb_domains=cb_domains, cb_goals=cb_goals,
 											  cb_means=cb_means, cb_myapproach=cb_myapproach, cb_contenttome=cb_contenttome,
-											  grid=cb_grid), code=code))
+											  grid=cb_grid), code=code_button))
+
+
+	cb_geography.js_on_change("active", CustomJS(args=dict(cb=cb, slider=sl_geo), code=code_cb))
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
 	left_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, 
@@ -283,7 +316,7 @@ def home():
 	#checkbox_grid = column([cb_reality])
 	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
 
-	slider_grid= column([active_text, *all_sliders])
+	slider_grid= column([active_text, *all_sliders, *list(sl_geo.values())])
 	# define the components: the javascript used and the div
 	# grid = layout([[button_grid,p]])
 	# page = row()
