@@ -25,4 +25,18 @@
     </div>
   </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    // verify our websocket connection is established
+    socket.on('connect', function() {
+        console.log('Websocket connected!');
+        console.log('MEEEEEEEEEEER');
+    });
+    console.log('Websocket dingen!');
+    console.log(document.domain);
+    console.log(location.port);
+  </script>
+
 {% endblock %}
