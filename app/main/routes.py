@@ -14,37 +14,16 @@ from bokeh.models.widgets import PreText
 from bokeh.models import Label
 from bokeh.models.widgets import Button, TextInput, Select, CheckboxGroup
 
-from app import app
+from . import main
 from app import image_plotting
-from app.utils.csv_to_dict import nowhere_metadata
 from decimal import Decimal
 import pandas as pd
 import numpy as np
 
 
-@app.route('/', methods = ['GET', 'POST'])
-@app.route('/home', methods = ['GET', 'POST'])
+@main.route('/', methods = ['GET', 'POST'])
+@main.route('/home', methods = ['GET', 'POST'])
 def home():
-	data = nowhere_metadata
-	
-	human_factor_data = pd.DataFrame(dict(data.human_factor), index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction']) 
-	geography_data = pd.DataFrame(dict(data.geography), index=['Europe', 'Nrth America', 'Middle East', 'Asia', 'Sth America'])
-	reality_data = pd.DataFrame(dict(data.reality), index=['Void', 'Non-place', 'Space', 'Nature', 'Development', 'Suburbia', 'Urbanisation', 'Sprawl', 'One Building', 'Part of a building', 'City Center', 'Grid/Order', 'Interior', 'Poster', 'Screen', 'Facade', 'Geographically Specific', 'Public Space', 'Private Space', 'Model', 'Plan'])
-	domains_data = pd.DataFrame(dict(data.domains), index=['Advertising / Promotion', 'Philosophy', 'Sociology', 'Communication', 'Urbanity', 'Science', 'Entertainment / Leisure', 'Industry', 'Information', 'Art', 'Architecture', 'Design', 'Public Service', 'Transportation', 'Nature']) # , index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction'] 
-	goals_data = pd.DataFrame(dict(data.goals), index=['Control', 'Power', 'Consuming', 'Knowledge', 'Information', 'Surveillance', 'Security', 'Money Wealth', 'Change', 'Progress', 'Community', 'Empowerment', 'Decoration', 'Escape', 'Symbolism', 'Globalisation', 'Mobility', 'Visibility', 'Fun']) 
-	means_data = pd.DataFrame(dict(data.means), index=['Confrontation', 'Exaggaration', 'Exclusivity', 'Conditioning', 'Repetition', 'Experimentation', 'Celebration', 'Chaos', 'Presence', 'Selection', 'Isolation', 'Manipulation', 'Persuasion', 'Promise', 'CoÃ¶peration', 'Variety', 'Improvisation', 'Destruction', 'Reconstruction', 'Simplification', 'Planning', 'Constrainment', 'System']) 
-	my_approach_data = pd.DataFrame(dict(data.my_approach), index=['About the medium', 'Documentary', 'Abstraction', 'Framing', 'Scaling', 'Reflection', 'Symmetry', 'Repeating elements', 'Composite', 'Front facing', 'Angle', 'Looking Up', 'Bird Eye View', 'Importance of Detail', 'Blur', 'Video', 'Long Exposure', 'Loop', 'Time Lapse', 'Crossover', 'Layers', 'Photoshop', 'Archetype', 'Metaphor', 'Location focus']) 
-	content_to_me_data = pd.DataFrame(dict(data.content_to_me), index=['Desire', 'Greed', 'Competition', 'Illusion', 'Attraction / Play', 'Memory', 'Solution', 'Contemplation', 'Images Rule', 'Movie references', 'Game references', 'Future Orientation', 'Ambition', 'Tradition', '24/7', 'Digitalisation', 'Degradation', 'Loneliness', 'Anonimity', 'Inhabitation', 'Individuality', 'Identity', 'Austerity', 'Limitation', 'Convention', 'Struggle', 'Interference', 'Substitution', 'Alienation', 'Space & Time', 'Pretention', 'Addiction', 'Belief/disbelief', 'High/Kick']) 
-	
-	human_factor_sources = ColumnDataSource(data=human_factor_data)
-	geography_sources = ColumnDataSource(data=geography_data)
-	reality_sources = ColumnDataSource(data=reality_data)
-	domains_sources = ColumnDataSource(data=domains_data)
-	goals_sources = ColumnDataSource(data=goals_data)
-	means_sources = ColumnDataSource(data=means_data)
-	my_approach_sources = ColumnDataSource(data=my_approach_data)
-	content_to_me_sources = ColumnDataSource(data=content_to_me_data)
-	
 	#Creating a dataframe that can be used for the bokeh input
 	df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
 	header = df.iloc[2]
@@ -76,6 +55,25 @@ def home():
 	df['y1'] = y_range - (df['rank'] - 1) // per_row
 	df['x2'] = (df['rank'] - 1) % per_row + image_width
 	df['y2'] = y_range - (df['rank'] - 1) // per_row - image_height
+
+
+	human_factor_data = df[['Politics', 'Corporate', 'Private', 'Public', 'Interaction']]
+	geography_data =df[['Europe', 'Nrth America', 'Middle East', 'Asia', 'Sth America']]
+	reality_data = df[['Void', 'Non-place', 'Space', 'Nature', 'Development', 'Suburbia', 'Urbanisation', 'Sprawl', 'One Building', 'Part of a building', 'City Center', 'Grid/Order', 'Interior', 'Poster', 'Screen', 'Facade', 'Geographically Specific', 'Public Space', 'Private Space', 'Model', 'Plan']]
+	domains_data = df[['Advertising / Promotion', 'Philosophy', 'Sociology', 'Communication', 'Urbanity', 'Science', 'Entertainment / Leisure', 'Industry', 'Information', 'Art', 'Architecture', 'Design', 'Public Service', 'Transportation', 'Nature']]
+	goals_data = df[['Control', 'Power', 'Consuming', 'Knowledge', 'Information', 'Surveillance', 'Security', 'Money Wealth', 'Change', 'Progress', 'Community', 'Empowerment', 'Decoration', 'Escape', 'Symbolism', 'Globalisation', 'Mobility', 'Visibility', 'Fun']]
+	means_data = df[['Confrontation', 'Exaggaration', 'Exclusivity', 'Conditioning', 'Repetition', 'Experimentation', 'Celebration', 'Chaos', 'Presence', 'Selection', 'Isolation', 'Manipulation', 'Persuasion', 'Promise', 'Coöperation', 'Variety', 'Improvisation', 'Destruction', 'Reconstruction', 'Simplification', 'Planning', 'Constrainment', 'System']]
+	my_approach_data = df[['About the medium', 'Documentary', 'Abstraction', 'Framing', 'Scaling', 'Reflection', 'Symmetry', 'Repeating elements', 'Composite', 'Front facing', 'Angle', 'Looking Up', 'Bird Eye View', 'Importance of Detail', 'Blur', 'Video', 'Long Exposure', 'Loop', 'Time Lapse', 'Crossover', 'Layers', 'Photoshop', 'Archetype', 'Metaphor', 'Location focus']] 
+	content_to_me_data = df[['Desire', 'Greed', 'Competition', 'Illusion', 'Attraction / Play', 'Memory', 'Solution', 'Contemplation', 'Images Rule', 'Movie references', 'Game references', 'Future Orientation', 'Ambition', 'Tradition', '24/7', 'Digitalisation', 'Degradation', 'Loneliness', 'Anonimity', 'Inhabitation', 'Individuality', 'Identity', 'Austerity', 'Limitation', 'Convention', 'Struggle', 'Interference', 'Substitution', 'Alienation', 'Space & Time', 'Pretention', 'Addiction', 'Belief/disbelief', 'High/Kick']] 
+	
+	human_factor_sources = ColumnDataSource(data=human_factor_data)
+	geography_sources = ColumnDataSource(data=geography_data)
+	reality_sources = ColumnDataSource(data=reality_data)
+	domains_sources = ColumnDataSource(data=domains_data)
+	goals_sources = ColumnDataSource(data=goals_data)
+	means_sources = ColumnDataSource(data=means_data)
+	my_approach_sources = ColumnDataSource(data=my_approach_data)
+	content_to_me_sources = ColumnDataSource(data=content_to_me_data)
 	
 	data_source = ColumnDataSource(data=df)
 
@@ -151,24 +149,24 @@ def home():
 	btn_contenttome = Button(label="Content To Me", button_type="primary", width=150)
 
 
-	cb_reality = CheckboxGroup(labels=list(reality_data.index.values))
-	cb_geography = CheckboxGroup(labels=list(geography_data.index.values))
-	cb_humanfactor = CheckboxGroup(labels=list(human_factor_data.index.values))
-	cb_domains = CheckboxGroup(labels=list(domains_data.index.values))
-	cb_goals = CheckboxGroup(labels=list(goals_data.index.values))
-	cb_means = CheckboxGroup(labels=list(means_data.index.values))
-	cb_myapproach = CheckboxGroup(labels=list(my_approach_data.index.values))
-	cb_contenttome = CheckboxGroup(labels=list(content_to_me_data.index.values))
+	cb_reality = CheckboxGroup(labels=list(reality_data.columns))
+	cb_geography = CheckboxGroup(labels=list(geography_data.columns))
+	cb_humanfactor = CheckboxGroup(labels=list(human_factor_data.columns))
+	cb_domains = CheckboxGroup(labels=list(domains_data.columns))
+	cb_goals = CheckboxGroup(labels=list(goals_data.columns))
+	cb_means = CheckboxGroup(labels=list(means_data.columns))
+	cb_myapproach = CheckboxGroup(labels=list(my_approach_data.columns))
+	cb_contenttome = CheckboxGroup(labels=list(content_to_me_data.columns))
 
 	
 	# The names of the sub-catogory data instead of sources is the pandas df
-	sub_cat_names = human_factor_data.index.values
+	sub_cat_names = human_factor_data.columns
 
 	
 
-	# TODO this needs to be an on-click image, now its just a random image
-	test_image = random.choice(list(data.naming_convention.keys()))
-	print(test_image)
+     # TODO this needs to be an on-click image, now its just a random image
+	# print(test_image)
+	# test_image = random.choice(list(data.naming_convention.keys()))
 
 	sl_geo = {}
 	slider_geo_index = geography_data.index.values
@@ -177,7 +175,6 @@ def home():
 		sl_geo[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
 		sl_geo[sliders].visible = False
 
-	print(list(sl_geo.values()))
 
 	# TODO Make these active filters interactive with click on the image
 	slider_1_value = 'Private'
@@ -186,7 +183,7 @@ def home():
 	slider_4_value = 'Corporate'
 	slider_5_value = 'Politics'
 
-	 # TODO fill in all the indices from all arrays (lots of work), all the subcategories have an unique index in their own category
+	# TODO fill in all the indices from all arrays (lots of work), all the subcategories have an unique index in their own category
 	topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]}
 	
 	active_text = PreText(text="Active Filters",width=200, height=40)
@@ -201,8 +198,6 @@ def home():
 	# leave this after the sliders because this thing is not a dict
 	topic_to_idx = ColumnDataSource(topic_to_idx)
 
-	# current image for active filters etc
-	current_im = ColumnDataSource({'im':[test_image]})
 
 	# create a list of the active sliders
 	all_sliders = [active_1, active_2, active_3, active_4, active_5]
@@ -331,11 +326,10 @@ def home():
 
 	script, div = components(total_grid)
 
-	return render_template('home.html',
-		images=images, data=data, r_script=script, r_div=div)
+	return render_template('home.html', r_script=script, r_div=div)
 	# return render_template('view3.html', title='Welcome!')
 
-@app.route("/view2/<image_name>", methods = ['GET', 'POST'])
+@main.route("/view2/<image_name>", methods = ['GET', 'POST'])
 def view2(image_name):
 	data = nowhere_metadata
 
@@ -496,7 +490,7 @@ def view2(image_name):
 	
 	return render_template('view2.html', images=images, data=data, l_square_script=l_square_script, l_square_div=l_square_div)
 
-@app.route('/favicon.ico')
+@main.route('/favicon.ico')
 def favicon():
 	return send_from_directory(os.path.join(app.root_path, 'static'),
 										'favicon.ico', mimetype='image/vnd.microsoft.icon')
