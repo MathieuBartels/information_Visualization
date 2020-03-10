@@ -29,28 +29,34 @@ def home():
 	header = df.iloc[2]
 	df = pd.DataFrame(df.values[4:], columns=header)
 	df.rename(columns={'1= very related': 'name'}, inplace=True)
-	df.columns.values[1] = "year"	
+	df.columns.values[1] = "year"
+	df["year"] = df["year"].astype('int32')
 	df.fillna(0, inplace=True)
 	df.sort_values(by=['name'], inplace=True)
-	df['rank'] = range(1, 221)
+	images = len(df)
+
+	print(df["year"])
 	
 	#Get urls of the images and add to the dataframe
-	images = os.listdir('app/static/230_works_1024x')
-	images = images[0:220]
-	urls = [f'/static/230_works_1024x/{image}' for image in images]
+	urls = [f"/static/230_works_1024x/{name.replace(' ', '_')}_{year}.jpg" for (name, year) in zip(df['name'], df['year'])]
 	df['urls'] = urls
 	
+	# df = df[]
+	df = df[[os.path.exists(f"app/static/230_works_1024x/{name.replace(' ', '_')}_{year}.jpg") for (name, year) in zip(df['name'], df['year'])]]
+	images = len(df)
+
+	df['rank'] = range(1, images+1)
 	#Plot formatting
 	image_height = 1
 	image_width = 1
 	per_row = 5
-	rows = 220/5
+	rows = images/5
 	x_range = per_row * image_width
-	y_range = 220 / per_row * image_height
+	y_range = images / per_row * image_height
 
 	#Add columns to the dataframe for the placing and formatting
-	df['w'] = [image_width] * 220
-	df['h'] = [image_height] * 220
+	df['w'] = [image_width] * images
+	df['h'] = [image_height] * images
 	df['x1'] = (df['rank'] - 1) % per_row
 	df['y1'] = y_range - (df['rank'] - 1) // per_row
 	df['x2'] = (df['rank'] - 1) % per_row + image_width
@@ -74,21 +80,34 @@ def home():
 	means_sources = ColumnDataSource(data=means_data)
 	my_approach_sources = ColumnDataSource(data=my_approach_data)
 	content_to_me_sources = ColumnDataSource(data=content_to_me_data)
+	df['filter_1'] = ""
+	df['filter_2'] = ""
+	df['filter_3'] = ""
 	
 	data_source = ColumnDataSource(data=df)
 
 	TOOLTIPS = [
 		('Name', "@name"),
 		('Rank', "@rank"),
-		('Year', "@year"),
-		('Active Filter placeholder', "@Public")
+		('filter 1', "@filter_1"),
+		('filter 2', "@filter_2"),
+		('filter 3', "@filter_3"),
+	]
+
+	TOOLTIPS1 = [
+		('Name', "@name")
+	]
+
+	TOOLTIPS2 = [
+		('bla', "@name")
 	]
 
 
-	p = figure(x_range=(0, x_range), y_range=(0, y_range), plot_width=1000, plot_height=4000, tools='hover, wheel_zoom', toolbar_location=None)
+	p = figure(x_range=(0, x_range), y_range=(0, y_range), plot_width=1000, plot_height=4000, tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
 	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
 
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
+
 
     
 	p.js_on_event(MouseMove, CustomJS(args=dict(data=data_source.data, per_row=per_row, rows=rows), code="""
@@ -201,7 +220,7 @@ def home():
 
 	# copy_data_source = ColumnDataSource(data=df)
 
-	callback = CustomJS(args=dict(source=data_source, sliders=all_sliders, image_height=image_height, image_width=image_width, per_row=per_row, rows=rows), code="""
+	callback = CustomJS(args=dict(tools=TOOLTIPS1, source=data_source, sliders=all_sliders, image_height=image_height, image_width=image_width, per_row=per_row, rows=rows, images=images), code="""
 		source_data = source["data"]
 
 		console.log(sliders);
@@ -220,8 +239,8 @@ def home():
 		// for each row of features subtract the slider value
 		const subtracted_feature_matrix = source_vectors.map(function(v, i) { return subtract(v,  slider_array[i])});
 
-		var scores = new Array(220)
-		for (i = 0; i < 220; i++) {
+		var scores = new Array(images)
+		for (i = 0; i < images; i++) {
 			scores[i] = Math.abs(subtracted_feature_matrix.map(value => value[i]).reduce((a,b) => a+b, 0))
 		} 
 
@@ -235,18 +254,29 @@ def home():
 		source["data"]["x1"] = rank
 
 		const x_range = per_row * image_width
-		const y_range = 220 / per_row * image_height
+		const y_range = 100 / per_row * image_height
 
 		source["data"]['x1'] = source["data"]['rank'].map(value => (value - 1) % per_row)
 		source["data"]['y1'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row))
 		source["data"]['x2'] = source["data"]['rank'].map(value => (value - 1) % per_row + image_width) 
 		source["data"]['y2'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
+
+		TOOLTIPS1 = [
+			('Name', "@year")
+		]
+
+		tools = TOOLTIPS1
+
+		console.log(TOOLTIPS1)
 		
 		source.change.emit()
 	""")
 
 	for slider in all_sliders:
 		slider.js_on_change('value', callback)
+		#p.add_tools(HoverTool(tooltips=TOOLTIPS2, callback=callback))
+
+	
 
 
 	#Grid of checkbox buttons. Had to be before callback to make it work.
@@ -319,7 +349,7 @@ def view2(image_name):
 	
 	#Get urls of the images and add to the dataframe
 	images = os.listdir('app/static/230_works_1024x')
-	images = images[0:220]
+	images = images[0:images]
 	urls = [f'/static/230_works_1024x/{image}' for image in images]
 	df['urls'] = urls
 	
@@ -467,7 +497,7 @@ def view2(image_name):
 
 @main.route('/favicon.ico')
 def favicon():
-	return send_from_directory(os.path.join(app.root_path, 'static'),
+	return send_from_directory(os.path.join(main.root_path, 'static'),
 										'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # @app.route("/filter", methods = ['GET', 'POST'])
