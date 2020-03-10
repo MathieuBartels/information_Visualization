@@ -197,12 +197,17 @@ def home():
 	# print(test_image)
 	# test_image = random.choice(list(data.naming_convention.keys()))
 
-	sl_geo = {}
-	slider_geo_index = geography_data.columns
+	#Dictionary for all the sliders
+	slider_all = {}
 
-	for sliders in slider_geo_index:
-		sl_geo[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
-		sl_geo[sliders].visible = False
+	# Get all slider titles in same array
+	slider_index_total = [geography_data.columns, reality_data.columns, human_factor_data.columns, domains_data.columns, goals_data.columns, means_data.columns, my_approach_data.columns, content_to_me_data.columns]
+
+	# Create all sliders and set them to invisible
+	for index in slider_index_total:
+		for sliders in index:
+			slider_all[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
+			slider_all[sliders].visible = False
 
 
 	# TODO Make these active filters interactive with click on the image
@@ -341,8 +346,9 @@ def home():
 											  cb_means=cb_means, cb_myapproach=cb_myapproach, cb_contenttome=cb_contenttome,
 											  grid=cb_grid), code=code_button))
 
+	for cb in cb_col:
+		cb.js_on_change("active", CustomJS(args=dict(slider=slider_all), code=code_cb))
 
-	cb_geography.js_on_change("active", CustomJS(args=dict(cb=cb, slider=sl_geo), code=code_cb))
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
 	left_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, 
@@ -353,7 +359,7 @@ def home():
 	#checkbox_grid = column([cb_reality])
 	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
 
-	slider_grid= column([active_text, *all_sliders, *list(sl_geo.values())])
+	slider_grid= column([active_text, *all_sliders, *list(slider_all.values())])
 	# define the components: the javascript used and the div
 	# grid = layout([[button_grid,p]])
 	# page = row()
@@ -373,7 +379,7 @@ def home():
 
 @main.route("/view2/<image_name>", methods = ['GET', 'POST'])
 def view2(image_name):
-	data = nowhere_metadata
+
 
 	df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
 	header = df.iloc[2]
