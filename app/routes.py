@@ -50,15 +50,16 @@ def home():
 	header = df.iloc[2]
 	df = pd.DataFrame(df.values[4:], columns=header)
 	df.rename(columns={'1= very related': 'name'}, inplace=True)
-	df.columns.values[1] = "year"	
+	df.columns.values[1] = "year"
+	df["year"] = df["year"].astype('int32')
 	df.fillna(0, inplace=True)
 	df.sort_values(by=['name'], inplace=True)
 	df['rank'] = range(1, 221)
+
+	print(df["year"])
 	
 	#Get urls of the images and add to the dataframe
-	images = os.listdir('app/static/230_works_1024x')
-	images = images[0:220]
-	urls = [f'/static/230_works_1024x/{image}' for image in images]
+	urls = [f"/static/230_works_1024x/{name.replace(' ', '_')}_{year}.jpg" for (name, year) in zip(df['name'], df['year'])]
 	df['urls'] = urls
 	
 	#Plot formatting
@@ -76,20 +77,43 @@ def home():
 	df['y1'] = y_range - (df['rank'] - 1) // per_row
 	df['x2'] = (df['rank'] - 1) % per_row + image_width
 	df['y2'] = y_range - (df['rank'] - 1) // per_row - image_height
+	df['filter_1'] = ""
+	df['filter_2'] = ""
+	df['filter_3'] = ""
 	
 	data_source = ColumnDataSource(data=df)
 
 	TOOLTIPS = [
 		('Name', "@name"),
 		('Rank', "@rank"),
-		('Year', "@year"),
-		('Active Filter placeholder', "@Public")
+		('filter 1', "@filter_1"),
+		('filter 2', "@filter_2"),
+		('filter 3', "@filter_3"),
 	]
 
+	TOOLTIPS1 = [
+		('Name', "@name")
+	]
+
+	TOOLTIPS2 = [
+		('bla', "@name")
+	]
+
+	df = pd.DataFrame(
+    {
+        "name": ['foo','bar'],
+        "kpi1": [1,2],
+        "kpi2": [2,1]
+    }
+)
+
+	#p = figure(x_range=(0, x_range), y_range=(0, y_range), plot_width=1000, plot_height=4000, toolbar_location=None)
+	
 	p = figure(x_range=(0, x_range), y_range=(0, y_range), plot_width=1000, plot_height=4000, tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
 	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
 
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
+
 
     
 
@@ -200,7 +224,7 @@ def home():
 
 	# copy_data_source = ColumnDataSource(data=df)
 
-	callback = CustomJS(args=dict(source=data_source, sliders=all_sliders, image_height=image_height, image_width=image_width, per_row=per_row, rows=rows), code="""
+	callback = CustomJS(args=dict(tools=TOOLTIPS1, source=data_source, sliders=all_sliders, image_height=image_height, image_width=image_width, per_row=per_row, rows=rows), code="""
 		source_data = source["data"]
 
 		// subtraction function where we subtract a value from an array
@@ -238,12 +262,23 @@ def home():
 		source["data"]['y1'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row))
 		source["data"]['x2'] = source["data"]['rank'].map(value => (value - 1) % per_row + image_width) 
 		source["data"]['y2'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
+
+		TOOLTIPS1 = [
+			('Name', "@year")
+		]
+
+		tools = TOOLTIPS1
+
+		console.log(TOOLTIPS1)
 		
 		source.change.emit()
 	""")
 
 	for slider in all_sliders:
 		slider.js_on_change('value', callback)
+		#p.add_tools(HoverTool(tooltips=TOOLTIPS2, callback=callback))
+
+	
 
 
 	#Grid of checkbox buttons. Had to be before callback to make it work.
@@ -298,8 +333,7 @@ def home():
 
 	script, div = components(total_grid)
 
-	return render_template('home.html',
-		images=images, data=data, r_script=script, r_div=div)
+	return render_template('home.html', r_script=script, r_div=div)
 	# return render_template('view3.html', title='Welcome!')
 
 @app.route("/view2/<image_name>", methods = ['GET', 'POST'])
