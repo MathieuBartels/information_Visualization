@@ -8,33 +8,35 @@ header = df.iloc[2]
 df = pd.DataFrame(df.values[4:], columns=header)
 df.rename(columns={'1= very related': 'name'}, inplace=True)
 df.columns.values[1] = "year"	
+df["year"] = df["year"].astype('int32')
 df.fillna(0, inplace=True)
 df.sort_values(by=['name'], inplace=True)
 
-image_amount = len(df)
-# df['rank'] = range(1, image_amount+1)
 
 #Get urls of the images and add to the dataframe
 images = os.listdir('app/static/230_works_1024x')
-images = images[0:image_amount]
-urls = [f'/static/230_works_1024x/{image}' for image in images]
+images = images[0:len(df)]
+
+urls = [f"/static/230_works_1024x/{name.replace(' ', '_')}_{year}.jpg" for (name, year) in zip(df['name'], df['year'])]
 df['urls'] = urls
 
-df = df[[os.path.exists(f"app/static/230_works_1024x/{name.replace(' ', '')}{year}.jpg") for (name, year) in zip(df['name'], df['year'])]]
-images_length = len(df)
+# print(urls)
 
+df = df[[os.path.exists(f"app/static/230_works_1024x/{name.replace(' ', '_')}_{year}.jpg") for (name, year) in zip(df['name'], df['year'])]]
+images_length = len(df)
 df['rank'] = range(1, images_length+1)
+
 #Plot formatting
 image_height = 1
 image_width = 1
 per_row = 5
-rows = image_amount/5
+rows = images_length/5
 x_range = per_row * image_width
-y_range = image_amount / per_row * image_height
+y_range = images_length / per_row * image_height
 
 #Add columns to the dataframe for the placing and formatting
-df['w'] = [image_width] * image_amount
-df['h'] = [image_height] * image_amount
+df['w'] = [image_width] * images_length
+df['h'] = [image_height] * images_length
 df['x1'] = (df['rank'] - 1) % per_row
 df['y1'] = y_range - (df['rank'] - 1) // per_row
 df['x2'] = (df['rank'] - 1) % per_row + image_width
@@ -66,7 +68,7 @@ for index in slider_index_total:
     for sliders in index:
         active[sliders] = False
 # #Dictionary for all the sliders
-# slider_all = {}
+# all_sliders = {}
 
 # # Get all slider titles in same array
 # slider_index_total = [geography_data.columns, reality_data.columns, human_factor_data.columns, domains_data.columns,goals_data.columns, means_data.columns,my_approach_data.columns, content_to_me_data.columns]
@@ -74,8 +76,8 @@ for index in slider_index_total:
 # # Create all sliders and set them to invisible
 # for index in slider_index_total:
 #     for sliders in index:
-#         slider_all[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
-#         slider_all[sliders].visible = False
+#         all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
+#         all_sliders[sliders].visible = False
 
 def update_data(row, column, new_value):
     df.loc[row, column] = new_value

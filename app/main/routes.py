@@ -40,31 +40,11 @@ def home():
 		('filter 3', "@filter_3"),
 	]
 
-	TOOLTIPS1 = [
-		('Name', "@name")
-	]
-
-	TOOLTIPS2 = [
-		('bla', "@name")
-	]
-
 
 	p = figure(x_range=(0, data.x_range), y_range=(0, data.y_range), plot_width=1000, plot_height=4000, tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
 	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
 
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
-
-
-    
-	p.js_on_event(MouseMove, CustomJS(args=dict(data=data_source.data, per_row=data.per_row, rows=data.rows), code="""
-		let x = Math.ceil(cb_obj.x);
-		let y = Math.ceil(cb_obj.y);
-
-		console.log(x, y);
-
-
-	"""))
-
 
 	p.js_on_event(Tap, CustomJS(args=dict(data=data_source.data, per_row=data.per_row, rows=data.rows), code="""
 
@@ -143,8 +123,8 @@ def home():
 	# print(test_image)
 	# test_image = random.choice(list(data.naming_convention.keys()))
 
-	# #Dictionary for all the sliders
-	# slider_all = {}
+	#Dictionary for all the sliders
+	all_sliders = {}
 
 	# # Get all slider titles in same array
 	# slider_index_total = [data.geography_data.columns, data.reality_data.columns, data.human_factor_data.columns, data.domains_data.columns, data.goals_data.columns, data.means_data.columns, data.my_approach_data.columns, data.content_to_me_data.columns]
@@ -152,8 +132,8 @@ def home():
 	# # Create all sliders and set them to invisible
 	# for index in slider_index_total:
 	# 	for sliders in index:
-	# 		slider_all[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
-	# 		slider_all[sliders].visible = False
+	# 		all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
+	# 		all_sliders[sliders].visible = False
 
 
 	# TODO Make these active filters interactive with click on the image
@@ -163,8 +143,8 @@ def home():
 	# slider_4_value = 'Corporate'
 	# slider_5_value = 'Politics'
 
-	# TODO fill in all the indices from all arrays (lots of work), all the subcategories have an unique index in their own category
-	topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]}
+	# # TODO fill in all the indices from all arrays (lots of work), all the subcategories have an unique index in their own category
+	# topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]}
 	
 	active_text = PreText(text="Active Filters",width=200, height=40)
 
@@ -184,18 +164,16 @@ def home():
 	# copy_data_source = ColumnDataSource(data=df)
 
 	#Dictionary for all the sliders
-	slider_all = {}
+	all_sliders = {}
 	
 	# Create all sliders and set them to invisible
 	for index in data.slider_index_total:
 		for sliders in index:
-			slider_all[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
-			slider_all[sliders].visible = data.active[sliders] 
+			all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
+			all_sliders[sliders].visible = data.active[sliders] 
 
-	callback = CustomJS(args=dict(tools=TOOLTIPS1, source=data_source, sliders=list(slider_all.values()), image_height=data.image_height, image_width=data.image_width, per_row=data.per_row, rows=data.rows, images=data.images), code="""
+	callback = CustomJS(args=dict(tools=TOOLTIPS1, source=data_source, sliders=list(all_sliders.values()), image_height=data.image_height, image_width=data.image_width, per_row=data.per_row, rows=data.rows, images=data.images), code="""
 		source_data = source["data"]
-
-		console.log(sliders);
 
 		// subtraction function where we subtract a value from an array
 		const subtract = function(array, value) {return array.map( array_at_i => array_at_i -value)}
@@ -232,19 +210,11 @@ def home():
 		source["data"]['y1'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row))
 		source["data"]['x2'] = source["data"]['rank'].map(value => (value - 1) % per_row + image_width) 
 		source["data"]['y2'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
-
-		TOOLTIPS1 = [
-			('Name', "@year")
-		]
-
-		tools = TOOLTIPS1
-
-		console.log(TOOLTIPS1)
 		
 		source.change.emit()
 	""")
 
-	for slider in list(slider_all.values()):
+	for slider in all_sliders.values():
 		slider.js_on_change('value', callback)
 		#p.add_tools(HoverTool(tooltips=TOOLTIPS2, callback=callback))
 
@@ -272,20 +242,16 @@ def home():
 		"""
 
 	code_cb = """
-		
-		var slider = slider;
 		var label = cb_obj.active.map(i=>cb_obj.labels[i])
 
-		for(i=0;i<cb_obj.labels.length;i++)
-		{
-			if(label.includes(cb_obj.labels[i]))
-			{
-			slider[cb_obj.labels[i]].visible=true;
+		for(i=0;i<cb_obj.labels.length;i++) {
+			
+			if(label.includes(cb_obj.labels[i])) {
+				slider[cb_obj.labels[i]].visible=true;
 			}
 		
-			else
-			{
-			slider[cb_obj.labels[i]].visible=false;
+			else {
+				slider[cb_obj.labels[i]].visible=false;
 			}
 		}
 	
@@ -299,19 +265,19 @@ def home():
 											  grid=cb_grid), code=code_button))
 
 	for cb in cb_col:
-		cb.js_on_change("active", CustomJS(args=dict(slider=slider_all), code=code_cb))
+		cb.js_on_change("active", CustomJS(args=dict(slider=all_sliders), code=code_cb))
 
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
 	left_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, 
-	btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, *list(slider_all.values())])
+	btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, *all_sliders.values()])
 
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
 	#checkbox_grid = column([cb_reality]
 	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
 
-	slider_grid= column([active_text, *list(slider_all.values())])
+	slider_grid= column([active_text, *list(all_sliders.values())])
 	# define the components: the javascript used and the div
 	# grid = layout([[button_grid,p]])
 	# page = row()
@@ -441,13 +407,13 @@ def view2(image_name):
 	# all_sliders = [active_1, active_2, active_3, active_4, active_5]
 
 	#Dictionary for all the sliders
-	slider_all = {}
+	all_sliders = {}
 	
 	# Create all sliders and set them to invisible
 	for index in data.slider_index_total:
 		for sliders in index:
-			slider_all[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
-			slider_all[sliders].visible = data.active[sliders] 
+			all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
+			all_sliders[sliders].visible = data.active[sliders] 
 
 	callback = CustomJS(args=dict(source=sources, tti=topic_to_idx, current_image=current_im), code="""
 		var data = source.data
@@ -465,11 +431,11 @@ def view2(image_name):
 		console.log(data[im_name][tti[var_text]]);
 	""")
 
-	for slider in list(slider_all.values()):
+	for slider in list(all_sliders.values()):
 		slider.js_on_change('value', callback)
 
 
-	slider_grid= column([active_text, *list(slider_all.values())])
+	slider_grid= column([active_text, *list(all_sliders.values())])
 	# define the components: the javascript used and the div
 
 	# the layout is a grid: square -- image -- square
