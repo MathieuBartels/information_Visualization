@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 from app import image_plotting
+from bokeh.models import ColumnDataSource
 
 df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
 header = df.iloc[2]
@@ -44,8 +45,17 @@ means_data = df[['Confrontation', 'Exaggaration', 'Exclusivity', 'Conditioning',
 my_approach_data = df[['About the medium', 'Documentary', 'Abstraction', 'Framing', 'Scaling', 'Reflection', 'Symmetry', 'Repeating elements', 'Composite', 'Front facing', 'Angle', 'Looking Up', 'Bird Eye View', 'Importance of Detail', 'Blur', 'Video', 'Long Exposure', 'Loop', 'Time Lapse', 'Crossover', 'Layers', 'Photoshop', 'Archetype', 'Metaphor', 'Location focus']] 
 content_to_me_data = df[['Desire', 'Greed', 'Competition', 'Illusion', 'Attraction / Play', 'Memory', 'Solution', 'Contemplation', 'Images Rule', 'Movie references', 'Game references', 'Future Orientation', 'Ambition', 'Tradition', '24/7', 'Digitalisation', 'Degradation', 'Loneliness', 'Anonimity', 'Inhabitation', 'Individuality', 'Identity', 'Austerity', 'Limitation', 'Convention', 'Struggle', 'Interference', 'Substitution', 'Alienation', 'Space & Time', 'Pretention', 'Addiction', 'Belief/disbelief', 'High/Kick']] 
 
+human_factor_sources = ColumnDataSource(data=human_factor_data)
+geography_sources = ColumnDataSource(data=geography_data)
+reality_sources = ColumnDataSource(data=reality_data)
+domains_sources = ColumnDataSource(data=domains_data)
+goals_sources = ColumnDataSource(data=goals_data)
+means_sources = ColumnDataSource(data=means_data)
+my_approach_sources = ColumnDataSource(data=my_approach_data)
+content_to_me_sources = ColumnDataSource(data=content_to_me_data)
 
 def update_data(row, column, new_value):
-    model_data.loc[row, column] = new_value
+    df.loc[row, column] = new_value
+    return df
 
-    return model_data
+
