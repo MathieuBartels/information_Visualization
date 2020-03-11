@@ -21,11 +21,22 @@ def on_model_update(info):
     new_value = info['newValue']
     column = info['column']
     row = info['row']
-
     # data.update_data(area, var, new_value)
     data.update_data(row, column, new_value)
-
     emit("model_update", {})
+
+
+@socketio.on("active_update")
+def on_active_update(info):
+    """Updating active sliders due to change in data"""
+    print("Emitting active update")
+    slider_name = info['slider_name']
+    var = bool(info['var'])
+    data.update_active(slider_name, var)
+    emit("active_update", {})
+
+
+
 
 @socketio.on('connect')
 def test_connect():

@@ -19,7 +19,17 @@
     img.src = "../data/230_works_1024x/Access_2007.jpg"
 </script> -->
 <!-- <script type="text/javascript" src="../static/js/show_image.js"></script> -->
+
 <div id="view2" class="view2_2"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+    
+    function updateModel(slider, value) {
+        console.log("in view2 html");
+		socket.emit('active_update', {slider_name: slider, var: value});
+	}
+    
+</script>
 {{l_square_script|safe }} 
 {{l_square_div|safe }}
 

@@ -51,14 +51,14 @@ means_data = df[['Confrontation', 'Exaggaration', 'Exclusivity', 'Conditioning',
 my_approach_data = df[['About the medium', 'Documentary', 'Abstraction', 'Framing', 'Scaling', 'Reflection', 'Symmetry', 'Repeating elements', 'Composite', 'Front facing', 'Angle', 'Looking Up', 'Bird Eye View', 'Importance of Detail', 'Blur', 'Video', 'Long Exposure', 'Loop', 'Time Lapse', 'Crossover', 'Layers', 'Photoshop', 'Archetype', 'Metaphor', 'Location focus']] 
 content_to_me_data = df[['Desire', 'Greed', 'Competition', 'Illusion', 'Attraction / Play', 'Memory', 'Solution', 'Contemplation', 'Images Rule', 'Movie references', 'Game references', 'Future Orientation', 'Ambition', 'Tradition', '24/7', 'Digitalisation', 'Degradation', 'Loneliness', 'Anonimity', 'Inhabitation', 'Individuality', 'Identity', 'Austerity', 'Limitation', 'Convention', 'Struggle', 'Interference', 'Substitution', 'Alienation', 'Space & Time', 'Pretention', 'Addiction', 'Belief/disbelief', 'High/Kick']] 
 
-human_factor_sources = ColumnDataSource(data=human_factor_data)
-geography_sources = ColumnDataSource(data=geography_data)
-reality_sources = ColumnDataSource(data=reality_data)
-domains_sources = ColumnDataSource(data=domains_data)
-goals_sources = ColumnDataSource(data=goals_data)
-means_sources = ColumnDataSource(data=means_data)
-my_approach_sources = ColumnDataSource(data=my_approach_data)
-content_to_me_sources = ColumnDataSource(data=content_to_me_data)
+# human_factor_sources = ColumnDataSource(data=human_factor_data)
+# geography_sources = ColumnDataSource(data=geography_data)
+# reality_sources = ColumnDataSource(data=reality_data)
+# domains_sources = ColumnDataSource(data=domains_data)
+# goals_sources = ColumnDataSource(data=goals_data)
+# means_sources = ColumnDataSource(data=means_data)
+# my_approach_sources = ColumnDataSource(data=my_approach_data)
+# content_to_me_sources = ColumnDataSource(data=content_to_me_data)
 
 # Get all slider titles in same array
 slider_index_total = [geography_data.columns, reality_data.columns, human_factor_data.columns, domains_data.columns,goals_data.columns, means_data.columns,my_approach_data.columns, content_to_me_data.columns]
@@ -67,6 +67,12 @@ active = {}
 for index in slider_index_total:
     for sliders in index:
         active[sliders] = False
+
+def update_active(slider, value):
+    print("update active")
+    active[slider] = value
+    return active
+
 # #Dictionary for all the sliders
 # all_sliders = {}
 

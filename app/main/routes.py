@@ -84,12 +84,21 @@ def home():
 	r_square.axis.visible = False
 	r_square.xgrid.grid_line_color = None
 
+	human_factor_sources = ColumnDataSource(data=data.human_factor_data)
+	geography_sources = ColumnDataSource(data=data.geography_data)
+	reality_sources = ColumnDataSource(data=data.reality_data)
+	domains_sources = ColumnDataSource(data=data.domains_data)
+	goals_sources = ColumnDataSource(data=data.goals_data)
+	means_sources = ColumnDataSource(data=data.means_data)
+	my_approach_sources = ColumnDataSource(data=data.my_approach_data)
+	content_to_me_sources = ColumnDataSource(data=data.content_to_me_data)
+
 	# TODO active sliders need to be created when a click happens on the image
 	# 1) click happens on image 2) top values of the image become active filters
 	# So this needs to communicate with the buttons which is not hard, and the subsubjects is also not hard
 	# the hard thing could be that this needs to change on click, so the sliders will need to change on a click of the button, how to do???
-	sources = [data.human_factor_sources, data.geography_sources, data.reality_sources,data.domains_sources,
-		data.goals_sources, data.means_sources, data.my_approach_sources, data.content_to_me_sources]
+	sources = [human_factor_sources, geography_sources, reality_sources,domains_sources,
+		goals_sources, means_sources, my_approach_sources, content_to_me_sources]
 
 	# only the first works because of the hard-coded sliders
 	sources = sources[0]
@@ -113,7 +122,6 @@ def home():
 	cb_myapproach = CheckboxGroup(labels=list(data.my_approach_data.columns))
 	cb_contenttome = CheckboxGroup(labels=list(data.content_to_me_data.columns))
 
-	
 	# The names of the sub-catogory data instead of sources is the pandas df
 	sub_cat_names = data.human_factor_data.columns
 
@@ -144,7 +152,7 @@ def home():
 	# slider_5_value = 'Politics'
 
 	# # TODO fill in all the indices from all arrays (lots of work), all the subcategories have an unique index in their own category
-	# topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]}
+	topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]}
 	
 	active_text = PreText(text="Active Filters",width=200, height=40)
 
@@ -172,7 +180,7 @@ def home():
 			all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
 			all_sliders[sliders].visible = data.active[sliders] 
 
-	callback = CustomJS(args=dict(tools=TOOLTIPS1, source=data_source, sliders=list(all_sliders.values()), image_height=data.image_height, image_width=data.image_width, per_row=data.per_row, rows=data.rows, images=data.images), code="""
+	callback = CustomJS(args=dict(source=data_source, sliders=list(all_sliders.values()), image_height=data.image_height, image_width=data.image_width, per_row=data.per_row, rows=data.rows, images=data.images), code="""
 		source_data = source["data"]
 
 		// subtraction function where we subtract a value from an array
@@ -245,19 +253,23 @@ def home():
 		var label = cb_obj.active.map(i=>cb_obj.labels[i])
 
 		for(i=0;i<cb_obj.labels.length;i++) {
-			
 			if(label.includes(cb_obj.labels[i])) {
 				slider[cb_obj.labels[i]].visible=true;
+				console.log(slider[cb_obj.labels[i]].title)
+				updateModel(slider[cb_obj.labels[i]].title, 1);
 			}
 		
 			else {
 				slider[cb_obj.labels[i]].visible=false;
+				updateModel(slider[cb_obj.labels[i]].title, 0);
 			}
 		}
 	
 		
 		"""
-
+	# ColumnDataSource(data.active
+	# active_data = ColumnDataSource(data=data.active)
+	
 	for button, cb in zip(button_col, cb_col):
 		button.js_on_click(CustomJS(args=dict(button=button,cb=cb,cb_reality=cb_reality,cb_geography=cb_geography,
 											  cb_humanfactor=cb_humanfactor, cb_domains=cb_domains, cb_goals=cb_goals,
@@ -298,42 +310,9 @@ def home():
 @main.route("/view2/<image_name>", methods = ['GET', 'POST'])
 def view2(image_name):
 	df = data.df
-
-	# df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
-	# header = df.iloc[2]
-	# df = pd.DataFrame(df.values[4:], columns=header)
-	# df.rename(columns={'1= very related': 'name'}, inplace=True)
-	# df.columns.values[1] = "year"	
-	# df.fillna(0, inplace=True)
-	# df.sort_values(by=['name'], inplace=True)
-	# df['rank'] = range(1, 221)
-	
-	#Get urls of the images and add to the dataframe
-	# images = os.listdir('app/static/230_works_1024x')
-	# images = images[0:images]
-	# urls = [f'/static/230_works_1024x/{image}' for image in images]
-	# df['urls'] = urls
-	
 	
 	image_data_row = df[df['name']==image_name]
-	print(image_data_row)
-	# human_factor_data = pd.DataFrame(dict(data.human_factor), index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction']) 
-	# geography_data = pd.DataFrame(dict(data.geography), index=['Europe', 'Nrth America', 'Middle East', 'Asia', 'Sth America'])
-	# reality_data = pd.DataFrame(dict(data.reality), index=['Void', 'Non-place', 'Space', 'Nature', 'Development', 'Suburbia', 'Urbanisation', 'Sprawl', 'One Building', 'Part of a building', 'City Center', 'Grid/Order', 'Interior', 'Poster', 'Screen', 'Facade', 'Geographically Specific', 'Public Space', 'Private Space', 'Model', 'Plan'])
-	# domains_data = pd.DataFrame(dict(data.domains), index=['Advertising / Promotion', 'Philosophy', 'Sociology', 'Communication', 'Urbanity', 'Science', 'Entertainment / Leisure', 'Industry', 'Information', 'Art', 'Architecture', 'Design', 'Public Service', 'Transportation', 'Nature']) # , index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction'] 
-	# goals_data = pd.DataFrame(dict(data.goals), index=['Control', 'Power', 'Consuming', 'Knowledge', 'Information', 'Surveillance', 'Security', 'Money Wealth', 'Change', 'Progress', 'Community', 'Empowerment', 'Decoration', 'Escape', 'Symbolism', 'Globalisation', 'Mobility', 'Visibility', 'Fun']) 
-	# means_data = pd.DataFrame(dict(data.means), index=['Confrontation', 'Exaggaration', 'Exclusivity', 'Conditioning', 'Repetition', 'Experimentation', 'Celebration', 'Chaos', 'Presence', 'Selection', 'Isolation', 'Manipulation', 'Persuasion', 'Promise', 'CoÃ¶peration', 'Variety', 'Improvisation', 'Destruction', 'Reconstruction', 'Simplification', 'Planning', 'Constrainment', 'System']) 
-	# my_approach_data = pd.DataFrame(dict(data.my_approach), index=['About the medium', 'Documentary', 'Abstraction', 'Framing', 'Scaling', 'Reflection', 'Symmetry', 'Repeating elements', 'Composite', 'Front facing', 'Angle', 'Looking Up', 'Bird Eye View', 'Importance of Detail', 'Blur', 'Video', 'Long Exposure', 'Loop', 'Time Lapse', 'Crossover', 'Layers', 'Photoshop', 'Archetype', 'Metaphor', 'Location focus']) 
-	# content_to_me_data = pd.DataFrame(dict(data.content_to_me), index=['Desire', 'Greed', 'Competition', 'Illusion', 'Attraction / Play', 'Memory', 'Solution', 'Contemplation', 'Images Rule', 'Movie references', 'Game references', 'Future Orientation', 'Ambition', 'Tradition', '24/7', 'Digitalisation', 'Degradation', 'Loneliness', 'Anonimity', 'Inhabitation', 'Individuality', 'Identity', 'Austerity', 'Limitation', 'Convention', 'Struggle', 'Interference', 'Substitution', 'Alienation', 'Space & Time', 'Pretention', 'Addiction', 'Belief/disbelief', 'High/Kick']) 
-	
-	# human_factor_sources = ColumnDataSource(data=human_factor_data)
-	# geography_sources = ColumnDataSource(data=geography_data)
-	# reality_sources = ColumnDataSource(data=reality_data)
-	# domains_sources = ColumnDataSource(data=domains_data)
-	# goals_sources = ColumnDataSource(data=goals_data)
-	# means_sources = ColumnDataSource(data=means_data)
-	# my_approach_sources = ColumnDataSource(data=my_approach_data)
-	# content_to_me_sources = ColumnDataSource(data=content_to_me_data)
+	print(f"{image_data_row} is image data row")
 
 	#Greate figure
 	p = figure(x_range=(0,10), y_range=(0,10), plot_width=20, plot_height=20,toolbar_location=None)
@@ -359,12 +338,21 @@ def view2(image_name):
 	# phase_slider = Slider(start=0, end=6.4, value=0, step=.1, title="Phase")
 	# offset_slider = Slider(start=-5, end=5, value=0, step=.1, title="Offset")
 
+	human_factor_sources = ColumnDataSource(data=data.human_factor_data)
+	geography_sources = ColumnDataSource(data=data.geography_data)
+	reality_sources = ColumnDataSource(data=data.reality_data)
+	domains_sources = ColumnDataSource(data=data.domains_data)
+	goals_sources = ColumnDataSource(data=data.goals_data)
+	means_sources = ColumnDataSource(data=data.means_data)
+	my_approach_sources = ColumnDataSource(data=data.my_approach_data)
+	content_to_me_sources = ColumnDataSource(data=data.content_to_me_data)
+
 	# TODO active sliders need to be created when a click happens on the image
 	# 1) click happens on image 2) top values of the image become active filters
 	# So this needs to communicate with the buttons which is not hard, and the subsubjects is also not hard
 	# the hard thing could be that this needs to change on click, so the sliders will need to change on a click of the button, how to do???
-	sources = [data.human_factor_sources, data.geography_sources, data.reality_sources, data.domains_sources,
-		data.goals_sources, data.means_sources, data.my_approach_sources, data.content_to_me_sources]
+	sources = [human_factor_sources, geography_sources, reality_sources,domains_sources,
+		goals_sources, means_sources, my_approach_sources, content_to_me_sources]
 
 	# only the first works because of the hard-coded sliders
 	sources = sources[0]
@@ -406,6 +394,17 @@ def view2(image_name):
 	# create a list of the active sliders
 	# all_sliders = [active_1, active_2, active_3, active_4, active_5]
 
+	cb_reality = CheckboxGroup(labels=list(data.reality_data.columns))
+	cb_geography = CheckboxGroup(labels=list(data.geography_data.columns))
+	cb_humanfactor = CheckboxGroup(labels=list(data.human_factor_data.columns))
+	cb_domains = CheckboxGroup(labels=list(data.domains_data.columns))
+	cb_goals = CheckboxGroup(labels=list(data.goals_data.columns))
+	cb_means = CheckboxGroup(labels=list(data.means_data.columns))
+	cb_myapproach = CheckboxGroup(labels=list(data.my_approach_data.columns))
+	cb_contenttome = CheckboxGroup(labels=list(data.content_to_me_data.columns))
+
+	cb_col = [cb_geography, cb_reality, cb_humanfactor, cb_domains, cb_goals, cb_means, cb_myapproach, cb_contenttome]
+
 	#Dictionary for all the sliders
 	all_sliders = {}
 	
@@ -414,6 +413,28 @@ def view2(image_name):
 		for sliders in index:
 			all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
 			all_sliders[sliders].visible = data.active[sliders] 
+	
+	print(all_sliders.values())
+
+	code_cb = """
+		var label = cb_obj.active.map(i=>cb_obj.labels[i])
+
+		for(i=0;i<cb_obj.labels.length;i++) {
+			
+			if(label.includes(cb_obj.labels[i])) {
+				slider[cb_obj.labels[i]].visible=true;
+			}
+		
+			else {
+				slider[cb_obj.labels[i]].visible=false;
+			}
+		}
+	
+		
+		"""
+	for cb in cb_col:
+		cb.js_on_change("active", CustomJS(args=dict(slider=all_sliders), code=code_cb))
+
 
 	callback = CustomJS(args=dict(source=sources, tti=topic_to_idx, current_image=current_im), code="""
 		var data = source.data
@@ -434,8 +455,9 @@ def view2(image_name):
 	for slider in list(all_sliders.values()):
 		slider.js_on_change('value', callback)
 
+	
 
-	slider_grid= column([active_text, *list(all_sliders.values())])
+	slider_grid= column([active_text, *all_sliders.values()])
 	# define the components: the javascript used and the div
 
 	# the layout is a grid: square -- image -- square
