@@ -15,7 +15,7 @@ from bokeh.models import Label
 from bokeh.models.widgets import Button, TextInput, Select, CheckboxGroup
 
 from . import main
-from app import image_plotting
+from app import image_plotting, data
 from decimal import Decimal
 import pandas as pd
 import numpy as np
@@ -24,44 +24,7 @@ import numpy as np
 @main.route('/', methods = ['GET', 'POST'])
 @main.route('/home', methods = ['GET', 'POST'])
 def home():
-	#Creating a dataframe that can be used for the bokeh input
-	df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
-	header = df.iloc[2]
-	df = pd.DataFrame(df.values[4:], columns=header)
-	df.rename(columns={'1= very related': 'name'}, inplace=True)
-	df.columns.values[1] = "year"
-	df["year"] = df["year"].astype('int32')
-	df.fillna(0, inplace=True)
-	df.sort_values(by=['name'], inplace=True)
-	images = len(df)
-
-	print(df["year"])
-	
-	#Get urls of the images and add to the dataframe
-	urls = [f"/static/230_works_1024x/{name.replace(' ', '_')}_{year}.jpg" for (name, year) in zip(df['name'], df['year'])]
-	df['urls'] = urls
-	
-	# df = df[]
-	df = df[[os.path.exists(f"app/static/230_works_1024x/{name.replace(' ', '_')}_{year}.jpg") for (name, year) in zip(df['name'], df['year'])]]
-	images = len(df)
-
-	df['rank'] = range(1, images+1)
-	#Plot formatting
-	image_height = 1
-	image_width = 1
-	per_row = 5
-	rows = images/5
-	x_range = per_row * image_width
-	y_range = images / per_row * image_height
-
-	#Add columns to the dataframe for the placing and formatting
-	df['w'] = [image_width] * images
-	df['h'] = [image_height] * images
-	df['x1'] = (df['rank'] - 1) % per_row
-	df['y1'] = y_range - (df['rank'] - 1) // per_row
-	df['x2'] = (df['rank'] - 1) % per_row + image_width
-	df['y2'] = y_range - (df['rank'] - 1) // per_row - image_height
-
+	df = data.df
 
 	human_factor_data = df[['Politics', 'Corporate', 'Private', 'Public', 'Interaction']]
 	geography_data =df[['Europe', 'Nrth America', 'Middle East', 'Asia', 'Sth America']]
@@ -94,33 +57,13 @@ def home():
 		('filter 3', "@filter_3"),
 	]
 
-	TOOLTIPS1 = [
-		('Name', "@name")
-	]
 
-	TOOLTIPS2 = [
-		('bla', "@name")
-	]
-
-
-	p = figure(x_range=(0, x_range), y_range=(0, y_range), plot_width=1000, plot_height=4000, tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
+	p = figure(x_range=(0, data.x_range), y_range=(0, data.y_range), plot_width=1000, plot_height=4000, tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
 	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
 
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
 
-
-    
-	p.js_on_event(MouseMove, CustomJS(args=dict(data=data_source.data, per_row=per_row, rows=rows), code="""
-		let x = Math.ceil(cb_obj.x);
-		let y = Math.ceil(cb_obj.y);
-
-		console.log(x, y);
-
-
-	"""))
-
-
-	p.js_on_event(Tap, CustomJS(args=dict(data=data_source.data, per_row=per_row, rows=rows), code="""
+	p.js_on_event(Tap, CustomJS(args=dict(data=data_source.data, per_row=data.per_row, rows=data.rows), code="""
 
 		const getKey = (obj,val) => Object.keys(obj).find(key => obj[key] === val);
 
@@ -198,7 +141,7 @@ def home():
 	# test_image = random.choice(list(data.naming_convention.keys()))
 
 	#Dictionary for all the sliders
-	slider_all = {}
+	all_sliders = {}
 
 	# Get all slider titles in same array
 	slider_index_total = [geography_data.columns, reality_data.columns, human_factor_data.columns, domains_data.columns, goals_data.columns, means_data.columns, my_approach_data.columns, content_to_me_data.columns]
@@ -206,42 +149,24 @@ def home():
 	# Create all sliders and set them to invisible
 	for index in slider_index_total:
 		for sliders in index:
-			slider_all[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
-			slider_all[sliders].visible = False
+			all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
+			all_sliders[sliders].visible = False
 
 
-	# TODO Make these active filters interactive with click on the image
-	slider_1_value = 'Private'
-	slider_2_value = "Public"
-	slider_3_value = 'Interaction'
-	slider_4_value = 'Corporate'
-	slider_5_value = 'Politics'
+	# # TODO Make these active filters interactive with click on the image
+	# slider_1_value = 'Private'
+	# slider_2_value = "Public"
+	# slider_3_value = 'Interaction'
+	# slider_4_value = 'Corporate'
+	# slider_5_value = 'Politics'
 
-	# TODO fill in all the indices from all arrays (lots of work), all the subcategories have an unique index in their own category
-	topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]}
+	# # TODO fill in all the indices from all arrays (lots of work), all the subcategories have an unique index in their own category
+	# topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]}
 	
 	active_text = PreText(text="Active Filters",width=200, height=40)
 
-	# All the sliderquad modules
-	active_1 = Slider(title=slider_1_value, value=0, start=0, end=1, step=0.01)
-	active_2 = Slider(title=slider_2_value, value=0, start=0, end=1, step=0.01)
-	active_3 = Slider(title=slider_3_value, value=0, start=0, end=1, step=0.01)
-	active_4 = Slider(title=slider_4_value, value=0, start=0, end=1, step=0.01) 
-	active_5 = Slider(title=slider_5_value, value=0, start=0, end=1, step=0.01)
-
-	# leave this after the sliders because this thing is not a dict
-	topic_to_idx = ColumnDataSource(topic_to_idx)
-
-
-	# create a list of the active sliders
-	all_sliders = [active_1, active_2, active_3, active_4, active_5]
-
-	# copy_data_source = ColumnDataSource(data=df)
-
-	callback = CustomJS(args=dict(tools=TOOLTIPS1, source=data_source, sliders=all_sliders, image_height=image_height, image_width=image_width, per_row=per_row, rows=rows, images=images), code="""
+	callback = CustomJS(args=dict(source=data_source, sliders=all_sliders, image_height=data.image_height, image_width=data.image_width, per_row=data.per_row, rows=data.rows, images=data.images), code="""
 		source_data = source["data"]
-
-		console.log(sliders);
 
 		// subtraction function where we subtract a value from an array
 		const subtract = function(array, value) {return array.map( array_at_i => array_at_i -value)}
@@ -278,19 +203,11 @@ def home():
 		source["data"]['y1'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row))
 		source["data"]['x2'] = source["data"]['rank'].map(value => (value - 1) % per_row + image_width) 
 		source["data"]['y2'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
-
-		TOOLTIPS1 = [
-			('Name', "@year")
-		]
-
-		tools = TOOLTIPS1
-
-		console.log(TOOLTIPS1)
 		
 		source.change.emit()
 	""")
 
-	for slider in all_sliders:
+	for slider in all_sliders.values():
 		slider.js_on_change('value', callback)
 		#p.add_tools(HoverTool(tooltips=TOOLTIPS2, callback=callback))
 
@@ -320,20 +237,16 @@ def home():
 		"""
 
 	code_cb = """
-		
-		var slider = slider;
 		var label = cb_obj.active.map(i=>cb_obj.labels[i])
 
-		for(i=0;i<cb_obj.labels.length;i++)
-		{
-			if(label.includes(cb_obj.labels[i]))
-			{
-			slider[cb_obj.labels[i]].visible=true;
+		for(i=0;i<cb_obj.labels.length;i++) {
+			
+			if(label.includes(cb_obj.labels[i])) {
+				slider[cb_obj.labels[i]].visible=true;
 			}
 		
-			else
-			{
-			slider[cb_obj.labels[i]].visible=false;
+			else {
+				slider[cb_obj.labels[i]].visible=false;
 			}
 		}
 	
@@ -347,19 +260,19 @@ def home():
 											  grid=cb_grid), code=code_button))
 
 	for cb in cb_col:
-		cb.js_on_change("active", CustomJS(args=dict(slider=slider_all), code=code_cb))
+		cb.js_on_change("active", CustomJS(args=dict(slider=all_sliders), code=code_cb))
 
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
 	left_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, 
-	btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, *all_sliders])
+	btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, *all_sliders.values()])
 
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
 	#checkbox_grid = column([cb_reality])
 	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
 
-	slider_grid= column([active_text, *all_sliders, *list(slider_all.values())])
+	slider_grid = column([active_text, *list(all_sliders.values())])
 	# define the components: the javascript used and the div
 	# grid = layout([[button_grid,p]])
 	# page = row()
