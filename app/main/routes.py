@@ -46,7 +46,7 @@ def home():
 
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
 
-	p.js_on_event(Tap, CustomJS(args=dict(data=data_source.data, per_row=data.per_row, rows=data.rows), code="""
+	p.js_on_event(MouseMove, CustomJS(args=dict(data=data_source.data, per_row=data.per_row, rows=data.rows), code="""
 
 		const getKey = (obj,val) => Object.keys(obj).find(key => obj[key] === val);
 
@@ -180,16 +180,18 @@ def home():
 			all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
 			all_sliders[sliders].visible = data.active[sliders] 
 
-	callback = CustomJS(args=dict(source=data_source, sliders=list(all_sliders.values()), image_height=data.image_height, image_width=data.image_width, per_row=data.per_row, rows=data.rows, images=data.images), code="""
+	callback = CustomJS(args=dict(source=data_source, sliders=list(all_sliders.values()), image_height=data.image_height, image_width=data.image_width, per_row=data.per_row, rows=data.rows, images=data.images_length), code="""
 		source_data = source["data"]
 
 		// subtraction function where we subtract a value from an array
 		const subtract = function(array, value) {return array.map( array_at_i => array_at_i -value)}
 
 		// slider array values
-		const slider_array = sliders.map(slider => slider['properties']['value']['spec']['value']);
+		console.log(sliders);
+		const active_sliders = sliders.filter(slider => slider["attributes"]["visible"]);
+		const slider_array = active_sliders.map(slider => slider['properties']['value']['spec']['value'] );
 		// slider array names
-		const slider_idx_to_name = sliders.map(slider => slider['attributes']['title']);
+		const slider_idx_to_name = active_sliders.map(slider => slider['attributes']['title']);
 
 		// source data for all images
 		const source_vectors = slider_idx_to_name.map(name => source_data[name]);
@@ -212,7 +214,7 @@ def home():
 		source["data"]["x1"] = rank
 
 		const x_range = per_row * image_width
-		const y_range = 100 / per_row * image_height
+		const y_range = images / per_row * image_height
 
 		source["data"]['x1'] = source["data"]['rank'].map(value => (value - 1) % per_row)
 		source["data"]['y1'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row))
@@ -224,7 +226,6 @@ def home():
 
 	for slider in all_sliders.values():
 		slider.js_on_change('value', callback)
-		#p.add_tools(HoverTool(tooltips=TOOLTIPS2, callback=callback))
 
 
 	#Grid of checkbox buttons. Had to be before callback to make it work.
@@ -312,7 +313,6 @@ def view2(image_name):
 	df = data.df
 	
 	image_data_row = df[df['name']==image_name]
-	print(f"{image_data_row} is image data row")
 
 	#Greate figure
 	p = figure(x_range=(0,10), y_range=(0,10), plot_width=20, plot_height=20,toolbar_location=None)
@@ -376,7 +376,6 @@ def view2(image_name):
 	topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]}
 	
 	active_text = PreText(text="Active Filters",width=200, height=40)
-	print(sources.data)
 
 	# All the slider modules
 	# active_1 = Slider(title=slider_1_value, value=sources.data[test_image][topic_to_idx[slider_1_value][0]], start=0, end=1, step=0.01)

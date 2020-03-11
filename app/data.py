@@ -3,6 +3,8 @@ import os
 from app import image_plotting
 from bokeh.models import ColumnDataSource, Slider
 
+import math
+
 df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
 header = df.iloc[2]
 df = pd.DataFrame(df.values[4:], columns=header)
@@ -30,7 +32,7 @@ df['rank'] = range(1, images_length+1)
 image_height = 1
 image_width = 1
 per_row = 5
-rows = images_length/5
+rows = math.ceil(images_length/5)
 x_range = per_row * image_width
 y_range = images_length / per_row * image_height
 
