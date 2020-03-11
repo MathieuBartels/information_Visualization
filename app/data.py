@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 from app import image_plotting
-from bokeh.models import ColumnDataSource
+from bokeh.models import ColumnDataSource, Slider
 
 df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
 header = df.iloc[2]
@@ -12,7 +12,7 @@ df.fillna(0, inplace=True)
 df.sort_values(by=['name'], inplace=True)
 
 image_amount = len(df)
-df['rank'] = range(1, image_amount+1)
+# df['rank'] = range(1, image_amount+1)
 
 #Get urls of the images and add to the dataframe
 images = os.listdir('app/static/230_works_1024x')
@@ -20,6 +20,10 @@ images = images[0:image_amount]
 urls = [f'/static/230_works_1024x/{image}' for image in images]
 df['urls'] = urls
 
+df = df[[os.path.exists(f"app/static/230_works_1024x/{name.replace(' ', '')}{year}.jpg") for (name, year) in zip(df['name'], df['year'])]]
+images_length = len(df)
+
+df['rank'] = range(1, images_length+1)
 #Plot formatting
 image_height = 1
 image_width = 1
@@ -53,6 +57,25 @@ goals_sources = ColumnDataSource(data=goals_data)
 means_sources = ColumnDataSource(data=means_data)
 my_approach_sources = ColumnDataSource(data=my_approach_data)
 content_to_me_sources = ColumnDataSource(data=content_to_me_data)
+
+# Get all slider titles in same array
+slider_index_total = [geography_data.columns, reality_data.columns, human_factor_data.columns, domains_data.columns,goals_data.columns, means_data.columns,my_approach_data.columns, content_to_me_data.columns]
+
+active = {}
+for index in slider_index_total:
+    for sliders in index:
+        active[sliders] = False
+# #Dictionary for all the sliders
+# slider_all = {}
+
+# # Get all slider titles in same array
+# slider_index_total = [geography_data.columns, reality_data.columns, human_factor_data.columns, domains_data.columns,goals_data.columns, means_data.columns,my_approach_data.columns, content_to_me_data.columns]
+
+# # Create all sliders and set them to invisible
+# for index in slider_index_total:
+#     for sliders in index:
+#         slider_all[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
+#         slider_all[sliders].visible = False
 
 def update_data(row, column, new_value):
     df.loc[row, column] = new_value
