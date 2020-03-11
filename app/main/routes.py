@@ -26,23 +26,6 @@ import numpy as np
 def home():
 	df = data.df
 
-	human_factor_data = df[['Politics', 'Corporate', 'Private', 'Public', 'Interaction']]
-	geography_data =df[['Europe', 'Nrth America', 'Middle East', 'Asia', 'Sth America']]
-	reality_data = df[['Void', 'Non-place', 'Space', 'Nature', 'Development', 'Suburbia', 'Urbanisation', 'Sprawl', 'One Building', 'Part of a building', 'City Center', 'Grid/Order', 'Interior', 'Poster', 'Screen', 'Facade', 'Geographically Specific', 'Public Space', 'Private Space', 'Model', 'Plan']]
-	domains_data = df[['Advertising / Promotion', 'Philosophy', 'Sociology', 'Communication', 'Urbanity', 'Science', 'Entertainment / Leisure', 'Industry', 'Information', 'Art', 'Architecture', 'Design', 'Public Service', 'Transportation', 'Nature']]
-	goals_data = df[['Control', 'Power', 'Consuming', 'Knowledge', 'Information', 'Surveillance', 'Security', 'Money Wealth', 'Change', 'Progress', 'Community', 'Empowerment', 'Decoration', 'Escape', 'Symbolism', 'Globalisation', 'Mobility', 'Visibility', 'Fun']]
-	means_data = df[['Confrontation', 'Exaggaration', 'Exclusivity', 'Conditioning', 'Repetition', 'Experimentation', 'Celebration', 'Chaos', 'Presence', 'Selection', 'Isolation', 'Manipulation', 'Persuasion', 'Promise', 'Coöperation', 'Variety', 'Improvisation', 'Destruction', 'Reconstruction', 'Simplification', 'Planning', 'Constrainment', 'System']]
-	my_approach_data = df[['About the medium', 'Documentary', 'Abstraction', 'Framing', 'Scaling', 'Reflection', 'Symmetry', 'Repeating elements', 'Composite', 'Front facing', 'Angle', 'Looking Up', 'Bird Eye View', 'Importance of Detail', 'Blur', 'Video', 'Long Exposure', 'Loop', 'Time Lapse', 'Crossover', 'Layers', 'Photoshop', 'Archetype', 'Metaphor', 'Location focus']] 
-	content_to_me_data = df[['Desire', 'Greed', 'Competition', 'Illusion', 'Attraction / Play', 'Memory', 'Solution', 'Contemplation', 'Images Rule', 'Movie references', 'Game references', 'Future Orientation', 'Ambition', 'Tradition', '24/7', 'Digitalisation', 'Degradation', 'Loneliness', 'Anonimity', 'Inhabitation', 'Individuality', 'Identity', 'Austerity', 'Limitation', 'Convention', 'Struggle', 'Interference', 'Substitution', 'Alienation', 'Space & Time', 'Pretention', 'Addiction', 'Belief/disbelief', 'High/Kick']] 
-	
-	human_factor_sources = ColumnDataSource(data=human_factor_data)
-	geography_sources = ColumnDataSource(data=geography_data)
-	reality_sources = ColumnDataSource(data=reality_data)
-	domains_sources = ColumnDataSource(data=domains_data)
-	goals_sources = ColumnDataSource(data=goals_data)
-	means_sources = ColumnDataSource(data=means_data)
-	my_approach_sources = ColumnDataSource(data=my_approach_data)
-	content_to_me_sources = ColumnDataSource(data=content_to_me_data)
 	df['filter_1'] = ""
 	df['filter_2'] = ""
 	df['filter_3'] = ""
@@ -105,8 +88,8 @@ def home():
 	# 1) click happens on image 2) top values of the image become active filters
 	# So this needs to communicate with the buttons which is not hard, and the subsubjects is also not hard
 	# the hard thing could be that this needs to change on click, so the sliders will need to change on a click of the button, how to do???
-	sources = [human_factor_sources, geography_sources, reality_sources,domains_sources,
-		goals_sources, means_sources, my_approach_sources, content_to_me_sources]
+	sources = [data.human_factor_sources, data.geography_sources, data.reality_sources,data.domains_sources,
+		data.goals_sources, data.means_sources, data.my_approach_sources, data.content_to_me_sources]
 
 	# only the first works because of the hard-coded sliders
 	sources = sources[0]
@@ -121,18 +104,18 @@ def home():
 	btn_contenttome = Button(label="Content To Me", button_type="primary", width=150)
 
 
-	cb_reality = CheckboxGroup(labels=list(reality_data.columns))
-	cb_geography = CheckboxGroup(labels=list(geography_data.columns))
-	cb_humanfactor = CheckboxGroup(labels=list(human_factor_data.columns))
-	cb_domains = CheckboxGroup(labels=list(domains_data.columns))
-	cb_goals = CheckboxGroup(labels=list(goals_data.columns))
-	cb_means = CheckboxGroup(labels=list(means_data.columns))
-	cb_myapproach = CheckboxGroup(labels=list(my_approach_data.columns))
-	cb_contenttome = CheckboxGroup(labels=list(content_to_me_data.columns))
+	cb_reality = CheckboxGroup(labels=list(data.reality_data.columns))
+	cb_geography = CheckboxGroup(labels=list(data.geography_data.columns))
+	cb_humanfactor = CheckboxGroup(labels=list(data.human_factor_data.columns))
+	cb_domains = CheckboxGroup(labels=list(data.domains_data.columns))
+	cb_goals = CheckboxGroup(labels=list(data.goals_data.columns))
+	cb_means = CheckboxGroup(labels=list(data.means_data.columns))
+	cb_myapproach = CheckboxGroup(labels=list(data.my_approach_data.columns))
+	cb_contenttome = CheckboxGroup(labels=list(data.content_to_me_data.columns))
 
 	
 	# The names of the sub-catogory data instead of sources is the pandas df
-	sub_cat_names = human_factor_data.columns
+	sub_cat_names = data.human_factor_data.columns
 
 	
 
@@ -144,7 +127,7 @@ def home():
 	all_sliders = {}
 
 	# Get all slider titles in same array
-	slider_index_total = [geography_data.columns, reality_data.columns, human_factor_data.columns, domains_data.columns, goals_data.columns, means_data.columns, my_approach_data.columns, content_to_me_data.columns]
+	slider_index_total = [data.geography_data.columns, data.reality_data.columns, data.human_factor_data.columns, data.domains_data.columns, data.goals_data.columns, data.means_data.columns, data.my_approach_data.columns, data.content_to_me_data.columns]
 
 	# Create all sliders and set them to invisible
 	for index in slider_index_total:
@@ -211,8 +194,6 @@ def home():
 		slider.js_on_change('value', callback)
 		#p.add_tools(HoverTool(tooltips=TOOLTIPS2, callback=callback))
 
-	
-
 
 	#Grid of checkbox buttons. Had to be before callback to make it work.
 	cb_grid = column([cb_geography, cb_reality, cb_humanfactor, cb_domains, cb_goals, cb_means, cb_myapproach, cb_contenttome])
@@ -269,7 +250,7 @@ def home():
 
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
-	#checkbox_grid = column([cb_reality])
+	#checkbox_grid = column([cb_reality]
 	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
 
 	slider_grid = column([active_text, *list(all_sliders.values())])
@@ -292,16 +273,16 @@ def home():
 
 @main.route("/view2/<image_name>", methods = ['GET', 'POST'])
 def view2(image_name):
+	df = data.df
 
-
-	df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
-	header = df.iloc[2]
-	df = pd.DataFrame(df.values[4:], columns=header)
-	df.rename(columns={'1= very related': 'name'}, inplace=True)
-	df.columns.values[1] = "year"	
-	df.fillna(0, inplace=True)
-	df.sort_values(by=['name'], inplace=True)
-	df['rank'] = range(1, 221)
+	# df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
+	# header = df.iloc[2]
+	# df = pd.DataFrame(df.values[4:], columns=header)
+	# df.rename(columns={'1= very related': 'name'}, inplace=True)
+	# df.columns.values[1] = "year"	
+	# df.fillna(0, inplace=True)
+	# df.sort_values(by=['name'], inplace=True)
+	# df['rank'] = range(1, 221)
 	
 	#Get urls of the images and add to the dataframe
 	images = os.listdir('app/static/230_works_1024x')
@@ -309,26 +290,26 @@ def view2(image_name):
 	urls = [f'/static/230_works_1024x/{image}' for image in images]
 	df['urls'] = urls
 	
+	
 	image_data_row = df[df['name']==image_name]
 	print(image_data_row)
+	# human_factor_data = pd.DataFrame(dict(data.human_factor), index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction']) 
+	# geography_data = pd.DataFrame(dict(data.geography), index=['Europe', 'Nrth America', 'Middle East', 'Asia', 'Sth America'])
+	# reality_data = pd.DataFrame(dict(data.reality), index=['Void', 'Non-place', 'Space', 'Nature', 'Development', 'Suburbia', 'Urbanisation', 'Sprawl', 'One Building', 'Part of a building', 'City Center', 'Grid/Order', 'Interior', 'Poster', 'Screen', 'Facade', 'Geographically Specific', 'Public Space', 'Private Space', 'Model', 'Plan'])
+	# domains_data = pd.DataFrame(dict(data.domains), index=['Advertising / Promotion', 'Philosophy', 'Sociology', 'Communication', 'Urbanity', 'Science', 'Entertainment / Leisure', 'Industry', 'Information', 'Art', 'Architecture', 'Design', 'Public Service', 'Transportation', 'Nature']) # , index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction'] 
+	# goals_data = pd.DataFrame(dict(data.goals), index=['Control', 'Power', 'Consuming', 'Knowledge', 'Information', 'Surveillance', 'Security', 'Money Wealth', 'Change', 'Progress', 'Community', 'Empowerment', 'Decoration', 'Escape', 'Symbolism', 'Globalisation', 'Mobility', 'Visibility', 'Fun']) 
+	# means_data = pd.DataFrame(dict(data.means), index=['Confrontation', 'Exaggaration', 'Exclusivity', 'Conditioning', 'Repetition', 'Experimentation', 'Celebration', 'Chaos', 'Presence', 'Selection', 'Isolation', 'Manipulation', 'Persuasion', 'Promise', 'CoÃ¶peration', 'Variety', 'Improvisation', 'Destruction', 'Reconstruction', 'Simplification', 'Planning', 'Constrainment', 'System']) 
+	# my_approach_data = pd.DataFrame(dict(data.my_approach), index=['About the medium', 'Documentary', 'Abstraction', 'Framing', 'Scaling', 'Reflection', 'Symmetry', 'Repeating elements', 'Composite', 'Front facing', 'Angle', 'Looking Up', 'Bird Eye View', 'Importance of Detail', 'Blur', 'Video', 'Long Exposure', 'Loop', 'Time Lapse', 'Crossover', 'Layers', 'Photoshop', 'Archetype', 'Metaphor', 'Location focus']) 
+	# content_to_me_data = pd.DataFrame(dict(data.content_to_me), index=['Desire', 'Greed', 'Competition', 'Illusion', 'Attraction / Play', 'Memory', 'Solution', 'Contemplation', 'Images Rule', 'Movie references', 'Game references', 'Future Orientation', 'Ambition', 'Tradition', '24/7', 'Digitalisation', 'Degradation', 'Loneliness', 'Anonimity', 'Inhabitation', 'Individuality', 'Identity', 'Austerity', 'Limitation', 'Convention', 'Struggle', 'Interference', 'Substitution', 'Alienation', 'Space & Time', 'Pretention', 'Addiction', 'Belief/disbelief', 'High/Kick']) 
 	
-	human_factor_data = pd.DataFrame(dict(data.human_factor), index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction']) 
-	geography_data = pd.DataFrame(dict(data.geography), index=['Europe', 'Nrth America', 'Middle East', 'Asia', 'Sth America'])
-	reality_data = pd.DataFrame(dict(data.reality), index=['Void', 'Non-place', 'Space', 'Nature', 'Development', 'Suburbia', 'Urbanisation', 'Sprawl', 'One Building', 'Part of a building', 'City Center', 'Grid/Order', 'Interior', 'Poster', 'Screen', 'Facade', 'Geographically Specific', 'Public Space', 'Private Space', 'Model', 'Plan'])
-	domains_data = pd.DataFrame(dict(data.domains), index=['Advertising / Promotion', 'Philosophy', 'Sociology', 'Communication', 'Urbanity', 'Science', 'Entertainment / Leisure', 'Industry', 'Information', 'Art', 'Architecture', 'Design', 'Public Service', 'Transportation', 'Nature']) # , index = ['Politics', 'Corporate', 'Private', 'Public', 'Interaction'] 
-	goals_data = pd.DataFrame(dict(data.goals), index=['Control', 'Power', 'Consuming', 'Knowledge', 'Information', 'Surveillance', 'Security', 'Money Wealth', 'Change', 'Progress', 'Community', 'Empowerment', 'Decoration', 'Escape', 'Symbolism', 'Globalisation', 'Mobility', 'Visibility', 'Fun']) 
-	means_data = pd.DataFrame(dict(data.means), index=['Confrontation', 'Exaggaration', 'Exclusivity', 'Conditioning', 'Repetition', 'Experimentation', 'Celebration', 'Chaos', 'Presence', 'Selection', 'Isolation', 'Manipulation', 'Persuasion', 'Promise', 'CoÃ¶peration', 'Variety', 'Improvisation', 'Destruction', 'Reconstruction', 'Simplification', 'Planning', 'Constrainment', 'System']) 
-	my_approach_data = pd.DataFrame(dict(data.my_approach), index=['About the medium', 'Documentary', 'Abstraction', 'Framing', 'Scaling', 'Reflection', 'Symmetry', 'Repeating elements', 'Composite', 'Front facing', 'Angle', 'Looking Up', 'Bird Eye View', 'Importance of Detail', 'Blur', 'Video', 'Long Exposure', 'Loop', 'Time Lapse', 'Crossover', 'Layers', 'Photoshop', 'Archetype', 'Metaphor', 'Location focus']) 
-	content_to_me_data = pd.DataFrame(dict(data.content_to_me), index=['Desire', 'Greed', 'Competition', 'Illusion', 'Attraction / Play', 'Memory', 'Solution', 'Contemplation', 'Images Rule', 'Movie references', 'Game references', 'Future Orientation', 'Ambition', 'Tradition', '24/7', 'Digitalisation', 'Degradation', 'Loneliness', 'Anonimity', 'Inhabitation', 'Individuality', 'Identity', 'Austerity', 'Limitation', 'Convention', 'Struggle', 'Interference', 'Substitution', 'Alienation', 'Space & Time', 'Pretention', 'Addiction', 'Belief/disbelief', 'High/Kick']) 
-	
-	human_factor_sources = ColumnDataSource(data=human_factor_data)
-	geography_sources = ColumnDataSource(data=geography_data)
-	reality_sources = ColumnDataSource(data=reality_data)
-	domains_sources = ColumnDataSource(data=domains_data)
-	goals_sources = ColumnDataSource(data=goals_data)
-	means_sources = ColumnDataSource(data=means_data)
-	my_approach_sources = ColumnDataSource(data=my_approach_data)
-	content_to_me_sources = ColumnDataSource(data=content_to_me_data)
+	# human_factor_sources = ColumnDataSource(data=human_factor_data)
+	# geography_sources = ColumnDataSource(data=geography_data)
+	# reality_sources = ColumnDataSource(data=reality_data)
+	# domains_sources = ColumnDataSource(data=domains_data)
+	# goals_sources = ColumnDataSource(data=goals_data)
+	# means_sources = ColumnDataSource(data=means_data)
+	# my_approach_sources = ColumnDataSource(data=my_approach_data)
+	# content_to_me_sources = ColumnDataSource(data=content_to_me_data)
 
 	#Greate figure
 	p = figure(x_range=(0,10), y_range=(0,10), plot_width=20, plot_height=20,toolbar_location=None)
@@ -358,14 +339,14 @@ def view2(image_name):
 	# 1) click happens on image 2) top values of the image become active filters
 	# So this needs to communicate with the buttons which is not hard, and the subsubjects is also not hard
 	# the hard thing could be that this needs to change on click, so the sliders will need to change on a click of the button, how to do???
-	sources = [human_factor_sources, geography_sources, reality_sources,domains_sources,
-		goals_sources, means_sources, my_approach_sources, content_to_me_sources]
+	sources = [data.human_factor_sources, data.geography_sources, data.reality_sources, data.domains_sources,
+		data.goals_sources, data.means_sources, data.my_approach_sources, data.content_to_me_sources]
 
 	# only the first works because of the hard-coded sliders
 	sources = sources[0]
 
 	# The names of the sub-catogory data instead of sources is the pandas df
-	sub_cat_names = human_factor_data.index.values
+	sub_cat_names = data.human_factor_data.index.values
 
 	# TODO this needs to be an on-click image, now its just a random image
 	test_image = random.choice(list(data.naming_convention.keys()))
@@ -419,29 +400,8 @@ def view2(image_name):
 		slider.js_on_change('value', callback)
 
 
-
-	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
-	# left_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, 
-	# btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, *all_sliders])
-
-
-	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
-	#checkbox_grid = column([cb_reality])
-	# button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
-	# cb_grid = column([cb_reality])
 	slider_grid= column([active_text, *all_sliders])
 	# define the components: the javascript used and the div
-	# grid = layout([[button_grid,p]])
-
-	# left_grid = layout([[button_grid,cb_grid],[slider_grid]])
-	# right_grid = layout([[p]])
-
-
-	# l_script, l_div = components(left_grid)
-	# r_script, r_div = components(p)
-
-	# return render_template('home.html',
-	# 	images=images, data=data, l_script=l_script, l_div=l_div, r_script=r_script, r_div=r_div)
 
 	# the layout is a grid: square -- image -- square
 	grid = gridplot([[p, slider_grid]], plot_width=600, plot_height=600, toolbar_location = None, sizing_mode='scale_both')
@@ -456,39 +416,3 @@ def favicon():
 	return send_from_directory(os.path.join(main.root_path, 'static'),
 										'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-# @app.route("/filter", methods = ['GET', 'POST'])
-# def filter():
-
-# 	#Buttons Maybe use for-loop?
-# 	btn_geography = Button(label="Geography", button_type="primary")
-# 	btn_reality = Button(label="Reality", button_type="danger")
-# 	btn_humanfactor = Button(label="Human Factor", button_type="warning")
-# 	btn_domains = Button(label="Domains", button_type="success")
-# 	btn_goals = Button(label="Goals", button_type="success")
-# 	btn_means = Button(label="Means", button_type="warning")
-# 	btn_myapproach = Button(label="My Approach", button_type="danger")
-# 	btn_contenttome = Button(label="Content To Me", button_type="primary")
-
-# 	grid = gridplot([[btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome]])
-
-# 	script, div = components(grid)
-# 	#Components for placing it on html
-# 	script0, div0 = components(btn_geography)
-# 	script1, div1 = components(btn_reality)
-# 	script2, div2 = components(btn_humanfactor)
-# 	script3, div3 = components(btn_domains)
-# 	script4, div4 = components(btn_goals)
-# 	script5, div5 = components(btn_means)
-# 	script6, div6 = components(btn_myapproach)
-# 	script7, div7 = components(btn_contenttome)
-
-
-# 	return render_template('filter.html', title='this is left square',
-# 						   script0=script0, div0=div0, btn_geography=btn_geography,
-# 						   script1=script1, div1=div1, btn_reality=btn_reality,
-# 						   script2=script2, div2=div2, btn_humanfactor=btn_humanfactor,
-# 						   script3=script3, div3=div3, btn_domains=btn_domains,
-# 						   script4=script4, div4=div4, btn_goals=btn_goals,
-# 						   script5=script5, div5=div5, btn_means=btn_means,
-# 						   script6=script6, div6=div6, btn_myapproach=btn_myapproach,
-# 						   script7=script7, div7=div7, btn_contenttome=btn_contenttome)
