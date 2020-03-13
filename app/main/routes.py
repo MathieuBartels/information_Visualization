@@ -46,18 +46,20 @@ def home():
 
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
 
-	p.js_on_event(Tap, CustomJS(args=dict(data=data_source.data, per_row=data.per_row, rows=data.rows), code="""
+	p.js_on_event(Tap, CustomJS(args=dict(data=data_source, per_row=data.per_row, rows=data.rows), code="""
 
+
+		console.log(data)
 		const getKey = (obj,val) => Object.keys(obj).find(key => obj[key] === val);
 
 		let x = Math.ceil(cb_obj.x);
-		let y = Math.ceil(cb_obj.y);
+		let y = Math.ceil(cb_obj.y+1);
 
 		let data_rank = (rows - y) * per_row + x
 		
-		let data_index = getKey(data['rank'], data_rank)
+		let data_index = getKey(data['attributes']['data']['rank'], data_rank)
 
-		window.location.href = '/view2/' + data['name'][data_index]; //relative to domain
+		window.location.href = '/view2/' + data['attributes']['data']['name'][data_index]; //relative to domain
 
 	"""))
 
@@ -336,35 +338,13 @@ def view2(image_name):
 	# The names of the sub-catogory data instead of sources is the pandas df
 	sub_cat_names = data.human_factor_data.index.values
 
-	# TODO this needs to be an on-click image, now its just a random image
-	# test_image = random.choice(list(data.naming_convention.keys()))
-	# print(test_image)
-	test_image = 'Piano'
-	
-	# TODO Make these active filters interactive with click on the image
-	slider_1_value = 'Private'
-	slider_2_value = "Public"
-	slider_3_value = 'Interaction'
-	slider_4_value = 'Corporate'
-	slider_5_value = 'Politics'
-
 	 # TODO fill in all the indices from all arrays (lots of work), all the subcategories have an unique index in their own category
 	topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]}
 	
 	active_text = PreText(text="Active Filters",width=200, height=40)
 
-	# All the slider modules
-	# active_1 = Slider(title=slider_1_value, value=sources.data[test_image][topic_to_idx[slider_1_value][0]], start=0, end=1, step=0.01)
-	# active_2 = Slider(title=slider_2_value, value=sources.data[test_image][topic_to_idx[slider_2_value][0]], start=0, end=1, step=0.01)
-	# active_3 = Slider(title=slider_3_value, value=sources.data[test_image][topic_to_idx[slider_3_value][0]], start=0, end=1, step=0.01)
-	# active_4 = Slider(title=slider_4_value, value=sources.data[test_image][topic_to_idx[slider_4_value][0]], start=0, end=1, step=0.01) 
-	# active_5 = Slider(title=slider_5_value, value=sources.data[test_image][topic_to_idx[slider_5_value][0]], start=0, end=1, step=0.01)
-
 	# leave this after the sliders because this thing is not a dict
 	topic_to_idx = ColumnDataSource(topic_to_idx)
-
-	# current image for active filters etc
-	current_im = ColumnDataSource({'im':[test_image]})
 
 	# create a list of the active sliders
 	# all_sliders = [active_1, active_2, active_3, active_4, active_5]
@@ -386,7 +366,7 @@ def view2(image_name):
 	# Create all sliders and set them to invisible
 	for index in data.slider_index_total:
 		for sliders in index:
-			all_sliders[sliders] = Slider(title=sliders, value=data.active[sliders][1], start=0, end=1, step=0.01)
+			all_sliders[sliders] = Slider(title=sliders, value=float(image_data_row.iloc[0][sliders]), start=0, end=1, step=0.01)
 			all_sliders[sliders].visible = data.active[sliders][0] 
 	
 	# print(all_sliders.values())
@@ -411,20 +391,9 @@ def view2(image_name):
 		cb.js_on_change("active", CustomJS(args=dict(slider=all_sliders), code=code_cb))
 
 
-	callback = CustomJS(args=dict(source=sources, tti=topic_to_idx, current_image=current_im), code="""
-		var data = source.data
-		var tti = tti.data
-		var im_name = current_image.data['im'][0]
-
-		var values = data["values"];
-		var value = cb_obj.value;
-		var var_text = cb_obj.title;
-
-		data[im_name][tti[var_text]] = value
-		source.data = data
-		source.change.emit()
-
-		//console.log(data[im_name][tti[var_text]]);
+	callback = CustomJS(args=dict(source=sources, image_name=image_data_row['name']), code="""
+		console.log(cb_obj);
+		updateDataframe(image_name, cb_obj.attributes.title, cb_obj.attributes.value)
 	""")
 
 	for slider in list(all_sliders.values()):

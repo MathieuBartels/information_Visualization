@@ -28,6 +28,17 @@ def on_active_update(info):
     var = float(info['var'])
     data.update_slider_value(slider_name, var)
 
+@socketio.on("dataframe_update")
+def update_dataframe(info):
+    image_name = info['image_name']
+    slider_name = info['slider_name']
+    new_value = info['value']
+
+    print('updating ', image_name, slider_name, new_value)
+
+    data.update_data(image_name[0], slider_name, new_value)
+
+
 
 
 @socketio.on('connect')

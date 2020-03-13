@@ -23,10 +23,13 @@
 <div id="view2" class="view2_2"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 <script type="text/javascript" charset="utf-8">
-    
-    function updateModel(slider, value) {
-        console.log("in view2 html");
-		socket.emit('active_update', {slider_name: slider, var: value});
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    // verify our websocket connection is established
+    socket.on('connect', function() {
+        console.log('Websocket connected!');
+    });
+    function updateDataframe(image_name, slider_name, value) {
+		socket.emit('dataframe_update', {image_name: image_name, slider_name: slider_name, value:value});
 	}
     
 </script>

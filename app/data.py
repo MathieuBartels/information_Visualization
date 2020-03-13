@@ -100,7 +100,7 @@ def update_slider_value(slider, value):
 #         all_sliders[sliders].visible = False
 
 def update_data(row, column, new_value):
-    df.loc[row, column] = new_value
+    df.loc[df['name']==row, column] = float(new_value)
     return df
 
 
