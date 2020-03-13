@@ -297,7 +297,7 @@ def home():
 	left_grid = layout([[button_grid,cb_grid],[slider_grid]])
 	right_grid = layout([[p]])
 
-	total_grid = layout([left_grid, right_grid])
+	total_grid = row([left_grid, right_grid])
 
 
 	# l_script, l_div = components(left_grid)
