@@ -46,7 +46,7 @@ def home():
 
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
 
-	p.js_on_event(MouseMove, CustomJS(args=dict(data=data_source.data, per_row=data.per_row, rows=data.rows), code="""
+	p.js_on_event(Tap, CustomJS(args=dict(data=data_source.data, per_row=data.per_row, rows=data.rows), code="""
 
 		const getKey = (obj,val) => Object.keys(obj).find(key => obj[key] === val);
 
@@ -187,7 +187,7 @@ def home():
 		const subtract = function(array, value) {return array.map( array_at_i => array_at_i -value)}
 
 		// slider array values
-		console.log(sliders);
+		//console.log(sliders);
 		const active_sliders = sliders.filter(slider => slider["attributes"]["visible"]);
 		const slider_array = active_sliders.map(slider => slider['properties']['value']['spec']['value'] );
 		// slider array names
@@ -413,7 +413,7 @@ def view2(image_name):
 			all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
 			all_sliders[sliders].visible = data.active[sliders] 
 	
-	print(all_sliders.values())
+	# print(all_sliders.values())
 
 	code_cb = """
 		var label = cb_obj.active.map(i=>cb_obj.labels[i])
@@ -448,7 +448,7 @@ def view2(image_name):
 		source.data = data
 		source.change.emit()
 
-		console.log(data[im_name][tti[var_text]]);
+		//console.log(data[im_name][tti[var_text]]);
 	""")
 
 	for slider in list(all_sliders.values()):
