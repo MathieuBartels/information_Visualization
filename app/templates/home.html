@@ -31,10 +31,13 @@
     socket.on('connect', function() {
         console.log('Websocket connected!');
     });
-    function updateModel(slider, value) {
-        console.log("in view2 html");
-		socket.emit('active_update', {slider_name: slider, var: value});
-	}
+    
+    function updateVisible(value) {
+		  socket.emit('active_update', {actives: value});
+	  }
+    function updateSliderValue(slider, value) {
+		  socket.emit('slider_value_update', {slider_name: slider, var: value});
+	  }
   </script>
 
 {% endblock %}

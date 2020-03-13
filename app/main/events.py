@@ -3,17 +3,6 @@ from .. import socketio
 from . import routes
 from .. import data
 
-@socketio.on('plot_update')
-def on_plot_update(info):
-    """Updating plot due to change in data"""
-    print("Emitting plot update")
-    new_value = info['newValue']
-    var_definition = info['definition']
-    # var_idx = data.model_vars_text.index(var_definition)
-    var_idx = 2
-    var = routes.model_vars[var_idx]
-    emit('plot_update', {'variable': var, 'new_value': new_value, 'index': var_idx})
-
 @socketio.on("model_update")
 def on_model_update(info):
     """Updating model due to change in data"""
@@ -23,18 +12,21 @@ def on_model_update(info):
     row = info['row']
     # data.update_data(area, var, new_value)
     data.update_data(row, column, new_value)
-    emit("model_update", {})
-
 
 @socketio.on("active_update")
 def on_active_update(info):
     """Updating active sliders due to change in data"""
     print("Emitting active update")
-    slider_name = info['slider_name']
-    var = bool(info['var'])
-    data.update_active(slider_name, var)
-    emit("active_update", {})
+    actives = list(info['actives'])
+    data.update_active(actives)
 
+@socketio.on("slider_value_update")
+def on_active_update(info):
+    """Updating active sliders due to change in data"""
+    print("Emitting active slider value")
+    slider_name = info['slider_name']
+    var = float(info['var'])
+    data.update_slider_value(slider_name, var)
 
 
 

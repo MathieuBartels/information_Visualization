@@ -134,34 +134,10 @@ def home():
 	#Dictionary for all the sliders
 	all_sliders = {}
 
-	# # Get all slider titles in same array
-	# slider_index_total = [data.geography_data.columns, data.reality_data.columns, data.human_factor_data.columns, data.domains_data.columns, data.goals_data.columns, data.means_data.columns, data.my_approach_data.columns, data.content_to_me_data.columns]
-
-	# # Create all sliders and set them to invisible
-	# for index in slider_index_total:
-	# 	for sliders in index:
-	# 		all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
-	# 		all_sliders[sliders].visible = False
-
-
-	# TODO Make these active filters interactive with click on the image
-	# slider_1_value = 'Private'
-	# slider_2_value = "Public"
-	# slider_3_value = 'Interaction'
-	# slider_4_value = 'Corporate'
-	# slider_5_value = 'Politics'
-
-	# # TODO fill in all the indices from all arrays (lots of work), all the subcategories have an unique index in their own category
 	topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]}
 	
 	active_text = PreText(text="Active Filters",width=200, height=40)
 
-	# All the sliderquad modules
-	# active_1 = Slider(title=slider_1_value, value=0, start=0, end=1, step=0.01)
-	# active_2 = Slider(title=slider_2_value, value=0, start=0, end=1, step=0.01)
-	# active_3 = Slider(title=slider_3_value, value=0, start=0, end=1, step=0.01)
-	# active_4 = Slider(title=slider_4_value, value=0, start=0, end=1, step=0.01) 
-	# active_5 = Slider(title=slider_5_value, value=0, start=0, end=1, step=0.01)
 
 	# leave this after the sliders because this thing is not a dict
 	topic_to_idx = ColumnDataSource(topic_to_idx)
@@ -177,11 +153,12 @@ def home():
 	# Create all sliders and set them to invisible
 	for index in data.slider_index_total:
 		for sliders in index:
-			all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
-			all_sliders[sliders].visible = data.active[sliders] 
+			all_sliders[sliders] = Slider(title=sliders, value=data.active[sliders][1], start=0, end=1, step=0.01)
+			all_sliders[sliders].visible = data.active[sliders][0] 
 
 	callback = CustomJS(args=dict(source=data_source, sliders=list(all_sliders.values()), image_height=data.image_height, image_width=data.image_width, per_row=data.per_row, rows=data.rows, images=data.images_length), code="""
 		source_data = source["data"]
+		updateSliderValue(cb_obj.attributes.title, cb_obj.attributes.value)
 
 		// subtraction function where we subtract a value from an array
 		const subtract = function(array, value) {return array.map( array_at_i => array_at_i -value)}
@@ -222,7 +199,7 @@ def home():
 		source["data"]['y2'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
 		
 		source.change.emit()
-	""")
+	"""	)
 
 	for slider in all_sliders.values():
 		slider.js_on_change('value', callback)
@@ -251,18 +228,17 @@ def home():
 		"""
 
 	code_cb = """
-		var label = cb_obj.active.map(i=>cb_obj.labels[i])
+		var label = cb_obj.active.map(i=>cb_obj.labels[i]);
+
+		updateVisible(label);
 
 		for(i=0;i<cb_obj.labels.length;i++) {
 			if(label.includes(cb_obj.labels[i])) {
 				slider[cb_obj.labels[i]].visible=true;
-				console.log(slider[cb_obj.labels[i]].title)
-				updateModel(slider[cb_obj.labels[i]].title, 1);
 			}
 		
 			else {
 				slider[cb_obj.labels[i]].visible=false;
-				updateModel(slider[cb_obj.labels[i]].title, 0);
 			}
 		}
 	
@@ -410,8 +386,8 @@ def view2(image_name):
 	# Create all sliders and set them to invisible
 	for index in data.slider_index_total:
 		for sliders in index:
-			all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
-			all_sliders[sliders].visible = data.active[sliders] 
+			all_sliders[sliders] = Slider(title=sliders, value=data.active[sliders][1], start=0, end=1, step=0.01)
+			all_sliders[sliders].visible = data.active[sliders][0] 
 	
 	# print(all_sliders.values())
 

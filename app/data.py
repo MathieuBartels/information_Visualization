@@ -68,12 +68,24 @@ slider_index_total = [geography_data.columns, reality_data.columns, human_factor
 active = {}
 for index in slider_index_total:
     for sliders in index:
-        active[sliders] = False
+        active[sliders] = [False, 0]
 
-def update_active(slider, value):
+def update_active(actives):
     print("update active")
-    active[slider] = value
+    for index in slider_index_total:
+        for sliders in index:
+            active[sliders] = [False, 0]
+
+    for slider in actives:
+        active[slider][0] = True
     return active
+
+
+def update_slider_value(slider, value):
+    print("update active")
+    active[slider][1] = value
+    return active
+
 
 # #Dictionary for all the sliders
 # all_sliders = {}
