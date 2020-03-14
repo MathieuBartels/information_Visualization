@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from app import image_plotting
 from bokeh.models import ColumnDataSource, Slider
-
+import numpy as np
 import math
 
 df = pd.read_csv("app/data/NOWHERE_DATASET.csv") 
@@ -11,9 +11,14 @@ df = pd.DataFrame(df.values[4:], columns=header)
 df.rename(columns={'1= very related': 'name'}, inplace=True)
 df.columns.values[1] = "year"	
 df["year"] = df["year"].astype('int32')
-df.fillna(0, inplace=True)
 df.sort_values(by=['name'], inplace=True)
 
+
+for name in df:
+    if name not in ['year', 'name']:
+        df[name] = pd.to_numeric(df[name], errors='coerce')
+        
+df = df.replace(np.nan, 0, regex=True)
 
 #Get urls of the images and add to the dataframe
 images = os.listdir('app/static/230_works_1024x')
