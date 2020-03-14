@@ -20,6 +20,7 @@ from decimal import Decimal
 import pandas as pd
 import numpy as np
 
+import math
 
 @main.route('/', methods = ['GET', 'POST'])
 @main.route('/home', methods = ['GET', 'POST'])
@@ -292,9 +293,41 @@ def home():
 
 @main.route("/view2/<image_name>", methods = ['GET', 'POST'])
 def view2(image_name):
-	df = data.df
 	
+	df = data.df
+
+	num_of_sim_images = 25
+
+	per_row = 5
+	rows = math.ceil(num_of_sim_images/5)
+	x_range = per_row * data.image_width
+	y_range = num_of_sim_images / per_row * data.image_height
+
+	df['simrank'] = df['rank']
+	df['sim_x1'] = (df['rank'] - 1) % per_row
+	df['sim_y1'] = y_range - (df['rank'] - 1) // per_row
+	df['sim_x2'] = (df['rank'] - 1) % per_row + data.image_width
+	df['sim_y2'] = y_range - (df['rank'] - 1) // per_row - data.image_height
+
+
+	data_source = ColumnDataSource(data=df)
+	
+	
+	p_sim = figure(x_range=(0, x_range), y_range=(0, y_range), plot_width=200, plot_height=200)
+	p_sim.image_url(url='urls', x='sim_x1', y='sim_y1', w='w', h='h', source=data_source)
+
+	p_sim.xgrid.visible = False
+	p_sim.ygrid.visible = False
+	p_sim.axis.visible = False
+	p_sim.xgrid.grid_line_color = None
+
+
 	image_data_row = df[df['name']==image_name]
+
+	p = figure(x_range=(0,10), y_range=(0,10), plot_width=20, plot_height=20,toolbar_location=None)
+	p.image_url(url=image_data_row['urls'], x=2.5, y=8, w=5, h=5)
+	
+
 
 	#Greate figure
 	p = figure(x_range=(0,10), y_range=(0,10), plot_width=20, plot_height=20,toolbar_location=None)
@@ -305,13 +338,6 @@ def view2(image_name):
 	p.ygrid.visible = False
 	p.axis.visible = False
 	p.xgrid.grid_line_color = None
-
-	# right square
-	# r_square = figure(plot_width=500, plot_height=500,toolbar_location=None, tools="")
-	# # r_square.square(x=[1], y=[2], size=[300], color="#74ADD1")
-	# r_square.rect([0.6], [0.6], [0.3], [0.3], color="#74ADD1")
-	# r_square.axis.visible = False
-	# r_square.xgrid.grid_line_color = None
 
 	active_text = PreText(text="Active Filters",width=200, height=40)
 
@@ -400,8 +426,56 @@ def view2(image_name):
 		cb.js_on_change("active", CustomJS(args=dict(slider=all_sliders), code=code_cb))
 	
 
-	callback = CustomJS(args=dict(image_name=image_data_row['name']), code="""
+	args=dict(image_name=image_data_row['name'],
+	 				source=data_source,
+					sliders=list(all_sliders.values()),
+					image_height=data.image_height,
+					image_width=data.image_width, 
+					per_row=data.per_row, 
+					rows=rows, 
+					images=data.images_length)
+
+	callback = CustomJS(args=args, code="""
 		updateDataframe(image_name, cb_obj.attributes.title, cb_obj.attributes.value)
+		console.log('update');
+		source_data = source["data"]	
+		
+		// subtraction function where we subtract a value from an array
+		const subtract = function(array, value) {return array.map( array_at_i => array_at_i -value)}
+
+		// slider array values
+		const slider_array = sliders.map(slider => slider['properties']['value']['spec']['value'] );
+		// slider array names
+		const slider_idx_to_name = sliders.map(slider => slider['attributes']['title']);
+
+		// source data for all images
+		const source_vectors = slider_idx_to_name.map(name => source_data[name]);
+
+		// for each row of features subtract the slider value
+		const subtracted_feature_matrix = source_vectors.map(function(v, i) { return subtract(v,  slider_array[i])});
+
+		var scores = new Array(images)
+		for (i = 0; i < images; i++) {
+			scores[i] = Math.abs(subtracted_feature_matrix.map(value => value[i]).reduce((a,b) => a+b, 0))
+		} 
+
+		indexedScores = scores.map(function(e,i){return {ind: i, val: e}});
+		// sort index/value couples, based on values
+		indexedScores.sort(function(x, y){return x.val > y.val ? 1 : x.val == y.val ? 0 : -1});
+		// make list keeping only indices
+		const rank = indexedScores.map(function(e){return e.ind + 1});
+
+		source["data"]['simrank'] = rank 
+
+		const x_range = per_row * image_width
+		const y_range = 25 / per_row * image_height
+
+		source["data"]['sim_x1'] = source["data"]['simrank'].map(value => (value - 1) % per_row)
+		source["data"]['sim_y1'] = source["data"]['simrank'].map(value => y_range - Math.floor((value - 1) / per_row))
+		source["data"]['sim_x2'] = source["data"]['simrank'].map(value => (value - 1) % per_row + image_width) 
+		source["data"]['sim_y2'] = source["data"]['simrank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
+		
+		source.change.emit()	
 	""")
 
 	for slider in list(all_sliders.values()):
@@ -420,7 +494,7 @@ def view2(image_name):
 	slider_grid= column([active_text, *all_sliders.values()])
 	# define the components: the javascript used and the div
 
-	grid = gridplot([[p, right_grid]], plot_width=600, plot_height=600, toolbar_location = None, sizing_mode='scale_both')
+	grid = gridplot([[p, right_grid],[p_sim]], plot_width=600, plot_height=600, toolbar_location = None, sizing_mode='scale_both')
 
 	# define the components: the javascript used and the div
 	l_square_script, l_square_div = components(grid)

@@ -58,15 +58,6 @@ means_data = df[['Confrontation', 'Exaggaration', 'Exclusivity', 'Conditioning',
 my_approach_data = df[['About the medium', 'Documentary', 'Abstraction', 'Framing', 'Scaling', 'Reflection', 'Symmetry', 'Repeating elements', 'Composite', 'Front facing', 'Angle', 'Looking Up', 'Bird Eye View', 'Importance of Detail', 'Blur', 'Video', 'Long Exposure', 'Loop', 'Time Lapse', 'Crossover', 'Layers', 'Photoshop', 'Archetype', 'Metaphor', 'Location focus']] 
 content_to_me_data = df[['Desire', 'Greed', 'Competition', 'Illusion', 'Attraction / Play', 'Memory', 'Solution', 'Contemplation', 'Images Rule', 'Movie references', 'Game references', 'Future Orientation', 'Ambition', 'Tradition', '24/7', 'Digitalisation', 'Degradation', 'Loneliness', 'Anonimity', 'Inhabitation', 'Individuality', 'Identity', 'Austerity', 'Limitation', 'Convention', 'Struggle', 'Interference', 'Substitution', 'Alienation', 'Space & Time', 'Pretention', 'Addiction', 'Belief/disbelief', 'High/Kick']] 
 
-# human_factor_sources = ColumnDataSource(data=human_factor_data)
-# geography_sources = ColumnDataSource(data=geography_data)
-# reality_sources = ColumnDataSource(data=reality_data)
-# domains_sources = ColumnDataSource(data=domains_data)
-# goals_sources = ColumnDataSource(data=goals_data)
-# means_sources = ColumnDataSource(data=means_data)
-# my_approach_sources = ColumnDataSource(data=my_approach_data)
-# content_to_me_sources = ColumnDataSource(data=content_to_me_data)
-
 # Get all slider titles in same array
 slider_index_total = [geography_data.columns, reality_data.columns, human_factor_data.columns, domains_data.columns,goals_data.columns, means_data.columns,my_approach_data.columns, content_to_me_data.columns]
 
@@ -82,26 +73,12 @@ def update_active(names, values):
             active[name][0] = True
         else:
             active[name] = [False, 0]
-
     return active
 
 def update_slider_value(slider, value):
     print("update active")
     active[slider][1] = value
     return active
-
-
-# #Dictionary for all the sliders
-# all_sliders = {}
-
-# # Get all slider titles in same array
-# slider_index_total = [geography_data.columns, reality_data.columns, human_factor_data.columns, domains_data.columns,goals_data.columns, means_data.columns,my_approach_data.columns, content_to_me_data.columns]
-
-# # Create all sliders and set them to invisible
-# for index in slider_index_total:
-#     for sliders in index:
-#         all_sliders[sliders] = Slider(title=sliders, value=0, start=0, end=1, step=0.01)
-#         all_sliders[sliders].visible = False
 
 def update_data(row, column, new_value):
     df.loc[df['name']==row, column] = float(new_value)
