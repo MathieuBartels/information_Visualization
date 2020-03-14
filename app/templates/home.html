@@ -32,9 +32,9 @@
         console.log('Websocket connected!');
     });
     
-    function updateVisible(value) {
-		  socket.emit('active_update', {actives: value});
-	  }
+    function updateVisible(names, values) {
+		  socket.emit('active_update', {slider_names: names, values: values });
+    }
     function updateSliderValue(slider, value) {
 		  socket.emit('slider_value_update', {slider_name: slider, var: value});
 	  }

@@ -115,14 +115,17 @@ def home():
 	btn_contenttome = Button(label="Content To Me", button_type="primary", width=150)
 
 
-	cb_reality = CheckboxGroup(labels=list(data.reality_data.columns))
-	cb_geography = CheckboxGroup(labels=list(data.geography_data.columns))
-	cb_humanfactor = CheckboxGroup(labels=list(data.human_factor_data.columns))
-	cb_domains = CheckboxGroup(labels=list(data.domains_data.columns))
-	cb_goals = CheckboxGroup(labels=list(data.goals_data.columns))
-	cb_means = CheckboxGroup(labels=list(data.means_data.columns))
-	cb_myapproach = CheckboxGroup(labels=list(data.my_approach_data.columns))
-	cb_contenttome = CheckboxGroup(labels=list(data.content_to_me_data.columns))
+	def get_active(column):
+		return [index for index, value in  enumerate(column) if data.active[value][0]]
+
+	cb_reality = CheckboxGroup(labels=list(data.reality_data.columns), active=get_active(data.reality_data.columns))
+	cb_geography = CheckboxGroup(labels=list(data.geography_data.columns), active=get_active(data.geography_data.columns))
+	cb_humanfactor = CheckboxGroup(labels=list(data.human_factor_data.columns), active=get_active(data.human_factor_data.columns))
+	cb_domains = CheckboxGroup(labels=list(data.domains_data.columns), active=get_active(data.domains_data.columns))
+	cb_goals = CheckboxGroup(labels=list(data.goals_data.columns), active=get_active(data.goals_data.columns))
+	cb_means = CheckboxGroup(labels=list(data.means_data.columns), active=get_active(data.means_data.columns))
+	cb_myapproach = CheckboxGroup(labels=list(data.my_approach_data.columns), active=get_active(data.my_approach_data.columns))
+	cb_contenttome = CheckboxGroup(labels=list(data.content_to_me_data.columns), active=get_active(data.content_to_me_data.columns))
 
 	# The names of the sub-catogory data instead of sources is the pandas df
 	sub_cat_names = data.human_factor_data.columns
@@ -230,19 +233,20 @@ def home():
 		"""
 
 	code_cb = """
-		var label = cb_obj.active.map(i=>cb_obj.labels[i]);
+		const label = cb_obj.active.map(i=>cb_obj.labels[i]);
+		const values = cb_obj.labels.map(x => label.includes(x));
 
-		updateVisible(label);
+		updateVisible(cb_obj.labels, values);
 
 		for(i=0;i<cb_obj.labels.length;i++) {
 			if(label.includes(cb_obj.labels[i])) {
 				slider[cb_obj.labels[i]].visible=true;
 			}
-		
 			else {
 				slider[cb_obj.labels[i]].visible=false;
 			}
 		}
+	
 	
 		
 		"""
@@ -302,64 +306,87 @@ def view2(image_name):
 	p.axis.visible = False
 	p.xgrid.grid_line_color = None
 
-	# script, div = components(p)
-
 	# right square
-	r_square = figure(plot_width=500, plot_height=500,toolbar_location=None, tools="")
-	# r_square.square(x=[1], y=[2], size=[300], color="#74ADD1")
-	r_square.rect([0.6], [0.6], [0.3], [0.3], color="#74ADD1")
-	r_square.axis.visible = False
-	r_square.xgrid.grid_line_color = None
+	# r_square = figure(plot_width=500, plot_height=500,toolbar_location=None, tools="")
+	# # r_square.square(x=[1], y=[2], size=[300], color="#74ADD1")
+	# r_square.rect([0.6], [0.6], [0.3], [0.3], color="#74ADD1")
+	# r_square.axis.visible = False
+	# r_square.xgrid.grid_line_color = None
 
-	amp_slider = Slider(start=0.1, end=10, value=1, step=.1, title="Amplitude")
-	# freq_slider = Slider(start=0.1, end=10, value=1, step=.1, title="Frequency")
-	# phase_slider = Slider(start=0, end=6.4, value=0, step=.1, title="Phase")
-	# offset_slider = Slider(start=-5, end=5, value=0, step=.1, title="Offset")
-
-	human_factor_sources = ColumnDataSource(data=data.human_factor_data)
-	geography_sources = ColumnDataSource(data=data.geography_data)
-	reality_sources = ColumnDataSource(data=data.reality_data)
-	domains_sources = ColumnDataSource(data=data.domains_data)
-	goals_sources = ColumnDataSource(data=data.goals_data)
-	means_sources = ColumnDataSource(data=data.means_data)
-	my_approach_sources = ColumnDataSource(data=data.my_approach_data)
-	content_to_me_sources = ColumnDataSource(data=data.content_to_me_data)
-
-	# TODO active sliders need to be created when a click happens on the image
-	# 1) click happens on image 2) top values of the image become active filters
-	# So this needs to communicate with the buttons which is not hard, and the subsubjects is also not hard
-	# the hard thing could be that this needs to change on click, so the sliders will need to change on a click of the button, how to do???
-	sources = [human_factor_sources, geography_sources, reality_sources,domains_sources,
-		goals_sources, means_sources, my_approach_sources, content_to_me_sources]
-
-	# only the first works because of the hard-coded sliders
-	sources = sources[0]
-
-	# The names of the sub-catogory data instead of sources is the pandas df
-	sub_cat_names = data.human_factor_data.index.values
-
-	 # TODO fill in all the indices from all arrays (lots of work), all the subcategories have an unique index in their own category
-	topic_to_idx = {'Corporate':[1], 'Politics': [0], 'Private':[2], 'Public':[3],'Interaction':[4]}
-	
 	active_text = PreText(text="Active Filters",width=200, height=40)
 
-	# leave this after the sliders because this thing is not a dict
-	topic_to_idx = ColumnDataSource(topic_to_idx)
+	btn_geography = Button(label="Geography", button_type="primary", width=150 )
+	btn_reality = Button(label="Reality", button_type="danger", width=150)
+	btn_humanfactor = Button(label="Human Factor", button_type="warning", width=150)
+	btn_domains = Button(label="Domains", button_type="success", width=150)
+	btn_goals = Button(label="Goals", button_type="success", width=150)
+	btn_means = Button(label="Means", button_type="warning", width=150)
+	btn_myapproach = Button(label="My Approach", button_type="danger", width=150)
+	btn_contenttome = Button(label="Content To Me", button_type="primary", width=150)
 
-	# create a list of the active sliders
-	# all_sliders = [active_1, active_2, active_3, active_4, active_5]
 
-	cb_reality = CheckboxGroup(labels=list(data.reality_data.columns))
-	cb_geography = CheckboxGroup(labels=list(data.geography_data.columns))
-	cb_humanfactor = CheckboxGroup(labels=list(data.human_factor_data.columns))
-	cb_domains = CheckboxGroup(labels=list(data.domains_data.columns))
-	cb_goals = CheckboxGroup(labels=list(data.goals_data.columns))
-	cb_means = CheckboxGroup(labels=list(data.means_data.columns))
-	cb_myapproach = CheckboxGroup(labels=list(data.my_approach_data.columns))
-	cb_contenttome = CheckboxGroup(labels=list(data.content_to_me_data.columns))
+	def get_active(column):
+		return [index for index, value in  enumerate(column) if data.active[value][0]]
+
+	cb_reality = CheckboxGroup(labels=list(data.reality_data.columns), active=get_active(data.reality_data.columns))
+	cb_geography = CheckboxGroup(labels=list(data.geography_data.columns), active=get_active(data.geography_data.columns))
+	cb_humanfactor = CheckboxGroup(labels=list(data.human_factor_data.columns), active=get_active(data.human_factor_data.columns))
+	cb_domains = CheckboxGroup(labels=list(data.domains_data.columns), active=get_active(data.domains_data.columns))
+	cb_goals = CheckboxGroup(labels=list(data.goals_data.columns), active=get_active(data.goals_data.columns))
+	cb_means = CheckboxGroup(labels=list(data.means_data.columns), active=get_active(data.means_data.columns))
+	cb_myapproach = CheckboxGroup(labels=list(data.my_approach_data.columns), active=get_active(data.my_approach_data.columns))
+	cb_contenttome = CheckboxGroup(labels=list(data.content_to_me_data.columns), active=get_active(data.content_to_me_data.columns))
 
 	cb_col = [cb_geography, cb_reality, cb_humanfactor, cb_domains, cb_goals, cb_means, cb_myapproach, cb_contenttome]
 
+
+	cb_grid = column([cb_geography, cb_reality, cb_humanfactor, cb_domains, cb_goals, cb_means, cb_myapproach, cb_contenttome])
+	cb_grid.visible = False
+
+	#list of buttons and checkbox for for-loop callback
+	button_col = [btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome]
+	cb_col = [cb_geography, cb_reality, cb_humanfactor, cb_domains, cb_goals, cb_means, cb_myapproach, cb_contenttome]
+
+	#Callback Javascript code for buttons
+	code_button = """
+		grid.visible=true;
+		cb_geography.visible=false;
+		cb_reality.visible=false;
+		cb_humanfactor.visible=false;
+		cb_domains.visible=false;
+		cb_goals.visible=false;
+		cb_means.visible=false;
+		cb_myapproach.visible=false;
+		cb_contenttome.visible=false;
+		cb.visible=true;
+		"""
+
+	code_cb = """
+
+		const label = cb_obj.active.map(i=>cb_obj.labels[i]);
+		const values = cb_obj.labels.map(x => label.includes(x));
+
+		updateVisible(cb_obj.labels, values);
+
+		for(i=0;i<cb_obj.labels.length;i++) {
+			if(label.includes(cb_obj.labels[i])) {
+				slider[cb_obj.labels[i]].visible=true;
+			}
+			else {
+				slider[cb_obj.labels[i]].visible=false;
+			}
+		}
+	
+		
+		"""
+	# ColumnDataSource(data.active
+	# active_data = ColumnDataSource(data=data.active)
+	
+	for button, cb in zip(button_col, cb_col):
+		button.js_on_click(CustomJS(args=dict(button=button,cb=cb,cb_reality=cb_reality,cb_geography=cb_geography,
+											  cb_humanfactor=cb_humanfactor, cb_domains=cb_domains, cb_goals=cb_goals,
+											  cb_means=cb_means, cb_myapproach=cb_myapproach, cb_contenttome=cb_contenttome,
+											  grid=cb_grid), code=code_button))
 	#Dictionary for all the sliders
 	all_sliders = {}
 	
@@ -368,44 +395,32 @@ def view2(image_name):
 		for sliders in index:
 			all_sliders[sliders] = Slider(title=sliders, value=float(image_data_row.iloc[0][sliders]), start=0, end=1, step=0.01)
 			all_sliders[sliders].visible = data.active[sliders][0] 
-	
-	# print(all_sliders.values())
 
-	code_cb = """
-		var label = cb_obj.active.map(i=>cb_obj.labels[i])
-
-		for(i=0;i<cb_obj.labels.length;i++) {
-			
-			if(label.includes(cb_obj.labels[i])) {
-				slider[cb_obj.labels[i]].visible=true;
-			}
-		
-			else {
-				slider[cb_obj.labels[i]].visible=false;
-			}
-		}
-	
-		
-		"""
 	for cb in cb_col:
 		cb.js_on_change("active", CustomJS(args=dict(slider=all_sliders), code=code_cb))
+	
 
-
-	callback = CustomJS(args=dict(source=sources, image_name=image_data_row['name']), code="""
-		console.log(cb_obj);
+	callback = CustomJS(args=dict(image_name=image_data_row['name']), code="""
 		updateDataframe(image_name, cb_obj.attributes.title, cb_obj.attributes.value)
 	""")
 
 	for slider in list(all_sliders.values()):
 		slider.js_on_change('value', callback)
 
-	
+
+	right_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, 
+	btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, *all_sliders.values()])
+
+
+	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
+
+	slider_grid= column([active_text, *list(all_sliders.values())])
+	right_grid = layout([[button_grid,cb_grid],[slider_grid]])
 
 	slider_grid= column([active_text, *all_sliders.values()])
 	# define the components: the javascript used and the div
 
-	# the layout is a grid: square -- image -- square
-	grid = gridplot([[p, slider_grid]], plot_width=600, plot_height=600, toolbar_location = None, sizing_mode='scale_both')
+	grid = gridplot([[p, right_grid]], plot_width=600, plot_height=600, toolbar_location = None, sizing_mode='scale_both')
 
 	# define the components: the javascript used and the div
 	l_square_script, l_square_div = components(grid)

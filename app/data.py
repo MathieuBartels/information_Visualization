@@ -75,16 +75,15 @@ for index in slider_index_total:
     for sliders in index:
         active[sliders] = [False, 0]
 
-def update_active(actives):
+def update_active(names, values):
     print("update active")
-    for index in slider_index_total:
-        for sliders in index:
-            active[sliders] = [False, 0]
+    for name, value in zip(names, values):
+        if value:
+            active[name][0] = True
+        else:
+            active[name] = [False, 0]
 
-    for slider in actives:
-        active[slider][0] = True
     return active
-
 
 def update_slider_value(slider, value):
     print("update active")

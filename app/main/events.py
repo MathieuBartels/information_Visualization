@@ -17,8 +17,9 @@ def on_model_update(info):
 def on_active_update(info):
     """Updating active sliders due to change in data"""
     print("Emitting active update")
-    actives = list(info['actives'])
-    data.update_active(actives)
+    actives = list(info['slider_names'])
+    values = list(info['values']) 
+    data.update_active(actives, values)
 
 @socketio.on("slider_value_update")
 def on_active_update(info):

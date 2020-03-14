@@ -31,6 +31,12 @@
     function updateDataframe(image_name, slider_name, value) {
 		socket.emit('dataframe_update', {image_name: image_name, slider_name: slider_name, value:value});
 	}
+    function updateVisible(names, values) {
+		  socket.emit('active_update', {slider_names: names, values: values });
+    }
+    function updateSliderValue(slider, value) {
+		  socket.emit('slider_value_update', {slider_name: slider, var: value});
+    }
     
 </script>
 {{l_square_script|safe }} 
