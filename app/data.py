@@ -38,8 +38,9 @@ df['urls'] = urls
 
 df = df[[os.path.exists(f"app/static/230_works_1024x/{name.replace(' ', '_')}_{year}.jpg") for (name, year) in zip(df['name'], df['year'])]]
 images_length = len(df)
-df['rank'] = range(1, images_length+1)
-
+df['rank'] = df['simrank'] = range(1, images_length+1)
+df['newrank'] = df['rank']
+df['score'] = df['rank']
 #Plot formatting
 image_height = 1
 image_width = 1
@@ -73,6 +74,8 @@ active_list = []
 for index in slider_index_total:
     for sliders in index:
         active[sliders] = [False, 0]
+
+all_index_names = list(active.keys())
 
 def update_active(names, values):
     print("update active")
@@ -111,6 +114,34 @@ def update_slider_value(slider, value):
         df['rank'].iloc[row] = rank
 
     return df['rank']
+
+def update_active_view2(names, values):
+    print("update active")
+    for name, value in zip(names, values):
+        if value:
+            active[name][0] = True
+        else:
+            active[name] = [False, 0]
+    return active
+
+
+def update_slider_value_view2(slider, value, image_name):
+    print("update active")
+    image_data = df[df['name'] == image_name[0]]
+    image_values = image_data[all_index_names].to_numpy()
+
+    if not len(active_list) == 0:
+        slider_values = np.array([active[slider][1] for slider in active_list])
+
+        df.loc[df['name']==image_name[0], 'score'] = image_data[active_list].apply(lambda x: similarity(x, slider_values), raw=True, axis=1)
+        df.loc[df['name']==image_name[0], 'newrank'] = list(np.argsort(df['score'])).index(image_data.index[0])
+
+    df['simscore'] = df[all_index_names].apply(lambda x: similarity(x, image_values), raw=True, axis=1)
+    df.replace(np.nan, 0, regex=True)
+    for rank, row in enumerate(np.argsort(df['simscore'])):
+        df['simrank'].iloc[row] = rank -1
+
+    return df['simrank']
 
 def update_data(row, column, new_value):
     df.loc[df['name']==row, column] = float(new_value)

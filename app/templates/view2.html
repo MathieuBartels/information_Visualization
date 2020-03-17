@@ -32,10 +32,10 @@
 		socket.emit('dataframe_update', {image_name: image_name, slider_name: slider_name, value:value});
 	}
     function updateVisible(names, values) {
-		  socket.emit('active_update', {slider_names: names, values: values });
+		  socket.emit('active_update_view2', {slider_names: names, values: values });
     }
-    function updateSliderValue(slider, value) {
-		  socket.emit('slider_value_update', {slider_name: slider, var: value});
+    function updateSliderValue(slider, value, image_name) {
+		  socket.emit('slider_value_update_view2', {slider_name: slider, var: value, image_name: image_name});
     }
     
 </script>

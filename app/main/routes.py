@@ -455,47 +455,25 @@ def view2(image_name):
 
 	callback = CustomJS(args=args, code="""
 		updateDataframe(image_name, cb_obj.attributes.title, cb_obj.attributes.value)
-		console.log('update');
 		source_data = source["data"]	
 		
-		// subtraction function where we subtract a value from an array
-		const subtract = function(array, value) {return array.map( array_at_i => array_at_i -value)}
-
-		// slider array values
-		const slider_array = sliders.map(slider => slider['properties']['value']['spec']['value'] );
-		// slider array names
-		const slider_idx_to_name = sliders.map(slider => slider['attributes']['title']);
-
-		// source data for all images
-		const source_vectors = slider_idx_to_name.map(name => source_data[name]);
-
-		// for each row of features subtract the slider value
-		const subtracted_feature_matrix = source_vectors.map(function(v, i) { return subtract(v,  slider_array[i])});
-
-		var scores = new Array(images)
-		for (i = 0; i < images; i++) {
-			scores[i] = Math.abs(subtracted_feature_matrix.map(value => value[i]).reduce((a,b) => a+b, 0))
-		} 
-
-		indexedScores = scores.map(function(e,i){return {ind: i, val: e}});
-		// sort index/value couples, based on values
-		indexedScores.sort(function(x, y){return x.val > y.val ? 1 : x.val == y.val ? 0 : -1});
-		// make list keeping only indices
-		const rank = indexedScores.map(function(e){return e.ind + 1});
-
-		source["data"]['simrank'] = rank 
 
 		const x_range = per_row * image_width
 		const y_range = 25 / per_row * image_height
-
-
-
-		source["data"]['sim_x1'] = source["data"]['simrank'].map(value => (value - 1) % per_row)
-		source["data"]['sim_y1'] = source["data"]['simrank'].map(value => y_range - Math.floor((value - 1) / per_row))
-		source["data"]['sim_x2'] = source["data"]['simrank'].map(value => (value - 1) % per_row + image_width) 
-		source["data"]['sim_y2'] = source["data"]['simrank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
 		
-		source.change.emit()	
+		source_data = source["data"]
+		updateSliderValue(cb_obj.attributes.title, cb_obj.attributes.value, image_name)
+
+		
+		socket.on('rank_update', function(msg) {
+            source["data"]['simrank'] = msg.rank;
+			source["data"]['sim_x1'] = source["data"]['simrank'].map(value => (value - 1) % per_row)
+			source["data"]['sim_y1'] = source["data"]['simrank'].map(value => y_range - Math.floor((value - 1) / per_row))
+			source["data"]['sim_x2'] = source["data"]['simrank'].map(value => (value - 1) % per_row + image_width) 
+			source["data"]['sim_y2'] = source["data"]['simrank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
+			source.change.emit()
+			}
+		);
 	""")
 
 	for slider in list(all_sliders.values()):
