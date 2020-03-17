@@ -95,7 +95,7 @@ def cosine(a,b):
         return (a @ b.T)/denom
 
 def similarity(a, b):
-    return 1 - cosine(a,b)
+    return euclidean(a,b)
 
 
 def update_slider_value(slider, value):
@@ -104,16 +104,11 @@ def update_slider_value(slider, value):
 
     slider_values = np.array([active[slider][1] for slider in active_list])
 
-    if len(active_list) == 1:
-        df['score'] = 1 - (df[active_list] - slider_values)
-        for rank, row in enumerate(np.argsort(df['score'])):
-            df['rank'].iloc[row] = rank+1
 
-    else:
-        df['score'] = df[active_list].apply(lambda x: similarity(x, slider_values), raw=True, axis=1)
-        df.replace(np.nan, 0, regex=True)
-        for rank, row in enumerate(np.argsort(df['score'])):
-            df['rank'].iloc[row] = rank
+    df['score'] = df[active_list].apply(lambda x: similarity(x, slider_values), raw=True, axis=1)
+    df.replace(np.nan, 0, regex=True)
+    for rank, row in enumerate(np.argsort(df['score'])):
+        df['rank'].iloc[row] = rank
 
     return df['rank']
 

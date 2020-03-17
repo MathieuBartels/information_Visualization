@@ -28,7 +28,6 @@ def on_slider_update(info):
     slider_name = info['slider_name']
     var = float(info['var'])
     df = data.update_slider_value(slider_name, var)
-    print(df.to_numpy())
     emit('rank_update', {'rank': df.to_numpy().tolist()})
 
 @socketio.on("dataframe_update")
