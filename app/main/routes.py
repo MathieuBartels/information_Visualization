@@ -118,14 +118,24 @@ def home():
 	def get_active(column):
 		return [index for index, value in  enumerate(column) if data.active[value][0]]
 
-	cb_reality = CheckboxGroup(labels=list(data.reality_data.columns), active=get_active(data.reality_data.columns))
-	cb_geography = CheckboxGroup(labels=list(data.geography_data.columns), active=get_active(data.geography_data.columns))
-	cb_humanfactor = CheckboxGroup(labels=list(data.human_factor_data.columns), active=get_active(data.human_factor_data.columns))
-	cb_domains = CheckboxGroup(labels=list(data.domains_data.columns), active=get_active(data.domains_data.columns))
-	cb_goals = CheckboxGroup(labels=list(data.goals_data.columns), active=get_active(data.goals_data.columns))
-	cb_means = CheckboxGroup(labels=list(data.means_data.columns), active=get_active(data.means_data.columns))
-	cb_myapproach = CheckboxGroup(labels=list(data.my_approach_data.columns), active=get_active(data.my_approach_data.columns))
-	cb_contenttome = CheckboxGroup(labels=list(data.content_to_me_data.columns), active=get_active(data.content_to_me_data.columns))
+	reality_sorted = data.reality_data.reindex(sorted(data.reality_data.columns), axis=1)
+	geo_sorted = data.geography_data.reindex(sorted(data.geography_data.columns), axis=1)
+	hf_sorted = data.human_factor_data.reindex(sorted(data.human_factor_data.columns), axis=1)
+	domains_sorted = data.domains_data.reindex(sorted(data.domains_data.columns), axis=1)
+	goals_sorted = data.goals_data.reindex(sorted(data.goals_data.columns), axis=1)
+	means_sorted = data.means_data.reindex(sorted(data.means_data.columns), axis=1)
+	mya_sorted = data.my_approach_data.reindex(sorted(data.my_approach_data.columns), axis=1)
+	ctt_sorted = data.content_to_me_data.reindex(sorted(data.content_to_me_data.columns), axis=1)
+
+
+	cb_reality = CheckboxGroup(labels=list(reality_sorted), active=get_active(reality_sorted))
+	cb_geography = CheckboxGroup(labels=list(geo_sorted), active=get_active(geo_sorted))
+	cb_humanfactor = CheckboxGroup(labels=list(hf_sorted), active=get_active(hf_sorted))
+	cb_domains = CheckboxGroup(labels=list(domains_sorted), active=get_active(domains_sorted))
+	cb_goals = CheckboxGroup(labels=list(goals_sorted), active=get_active(goals_sorted))
+	cb_means = CheckboxGroup(labels=list(means_sorted), active=get_active(means_sorted))
+	cb_myapproach = CheckboxGroup(labels=list(mya_sorted), active=get_active(mya_sorted))
+	cb_contenttome = CheckboxGroup(labels=list(ctt_sorted), active=get_active(ctt_sorted))
 
 	# The names of the sub-catogory data instead of sources is the pandas df
 	sub_cat_names = data.human_factor_data.columns
