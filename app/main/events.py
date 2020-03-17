@@ -22,12 +22,14 @@ def on_active_update(info):
     data.update_active(actives, values)
 
 @socketio.on("slider_value_update")
-def on_active_update(info):
+def on_slider_update(info):
     """Updating active sliders due to change in data"""
     print("Emitting active slider value")
     slider_name = info['slider_name']
     var = float(info['var'])
-    data.update_slider_value(slider_name, var)
+    df = data.update_slider_value(slider_name, var)
+    print(df.to_numpy())
+    emit('rank_update', {'rank': df.to_numpy().tolist()})
 
 @socketio.on("dataframe_update")
 def update_dataframe(info):
