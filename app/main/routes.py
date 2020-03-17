@@ -30,6 +30,7 @@ def home():
 	df['filter_1'] = ""
 	df['filter_2'] = ""
 	df['filter_3'] = ""
+	df['empty'] = ""
 	
 	data_source = ColumnDataSource(data=df)
 
@@ -203,6 +204,44 @@ def home():
 		source["data"]['y1'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row))
 		source["data"]['x2'] = source["data"]['rank'].map(value => (value - 1) % per_row + image_width) 
 		source["data"]['y2'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
+
+		const filter_amount = slider_idx_to_name.length
+		console.log(filter_amount)
+
+		if (filter_amount > 2){
+			var hover_name_1 = slider_idx_to_name.slice(0, 1);
+			var hover_name_2 = slider_idx_to_name.slice(1, 2);
+			var hover_name_3 = slider_idx_to_name.slice(2, 3);
+
+			source["data"]['filter_1'] = source_data[hover_name_1]
+			source["data"]['filter_2'] = source_data[hover_name_2]
+			source["data"]['filter_3'] = source_data[hover_name_3]
+		}
+
+		if (filter_amount == 2){
+			var hover_name_1 = slider_idx_to_name.slice(0, 1);
+			var hover_name_2 = slider_idx_to_name.slice(1, 2);
+
+			source["data"]['filter_1'] = source_data[hover_name_1]
+			source["data"]['filter_2'] = source_data[hover_name_2]
+			source["data"]['filter_3'] = source["data"]['empty']
+		}
+
+		if (filter_amount == 1){
+			var hover_name_1 = slider_idx_to_name.slice(0, 1);
+
+			source["data"]['filter_1'] = source_data[hover_name_1]
+			source["data"]['filter_2'] = source["data"]['empty']
+			source["data"]['filter_3'] = source["data"]['empty']
+		}
+		
+
+
+		
+
+
+		
+
 		
 		source.change.emit()
 	"""	)
@@ -469,6 +508,8 @@ def view2(image_name):
 
 		const x_range = per_row * image_width
 		const y_range = 25 / per_row * image_height
+
+
 
 		source["data"]['sim_x1'] = source["data"]['simrank'].map(value => (value - 1) % per_row)
 		source["data"]['sim_y1'] = source["data"]['simrank'].map(value => y_range - Math.floor((value - 1) / per_row))
