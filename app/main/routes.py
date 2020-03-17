@@ -49,7 +49,9 @@ def home():
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
 
 	p.js_on_event(Tap, CustomJS(args=dict(data=data_source, per_row=data.per_row, rows=data.rows), code="""
-		//console.log(data)
+
+
+		console.log(data)
 		const getKey = (obj,val) => Object.keys(obj).find(key => obj[key] === val);
 
 		let x = Math.ceil(cb_obj.x);
@@ -118,24 +120,14 @@ def home():
 	def get_active(column):
 		return [index for index, value in  enumerate(column) if data.active[value][0]]
 
-	reality_sorted = data.reality_data.reindex(sorted(data.reality_data.columns), axis=1)
-	geo_sorted = data.geography_data.reindex(sorted(data.geography_data.columns), axis=1)
-	hf_sorted = data.human_factor_data.reindex(sorted(data.human_factor_data.columns), axis=1)
-	domains_sorted = data.domains_data.reindex(sorted(data.domains_data.columns), axis=1)
-	goals_sorted = data.goals_data.reindex(sorted(data.goals_data.columns), axis=1)
-	means_sorted = data.means_data.reindex(sorted(data.means_data.columns), axis=1)
-	mya_sorted = data.my_approach_data.reindex(sorted(data.my_approach_data.columns), axis=1)
-	ctt_sorted = data.content_to_me_data.reindex(sorted(data.content_to_me_data.columns), axis=1)
-
-
-	cb_reality = CheckboxGroup(labels=list(reality_sorted), active=get_active(reality_sorted))
-	cb_geography = CheckboxGroup(labels=list(geo_sorted), active=get_active(geo_sorted))
-	cb_humanfactor = CheckboxGroup(labels=list(hf_sorted), active=get_active(hf_sorted))
-	cb_domains = CheckboxGroup(labels=list(domains_sorted), active=get_active(domains_sorted))
-	cb_goals = CheckboxGroup(labels=list(goals_sorted), active=get_active(goals_sorted))
-	cb_means = CheckboxGroup(labels=list(means_sorted), active=get_active(means_sorted))
-	cb_myapproach = CheckboxGroup(labels=list(mya_sorted), active=get_active(mya_sorted))
-	cb_contenttome = CheckboxGroup(labels=list(ctt_sorted), active=get_active(ctt_sorted))
+	cb_reality = CheckboxGroup(labels=list(data.reality_data.columns), active=get_active(data.reality_data.columns))
+	cb_geography = CheckboxGroup(labels=list(data.geography_data.columns), active=get_active(data.geography_data.columns))
+	cb_humanfactor = CheckboxGroup(labels=list(data.human_factor_data.columns), active=get_active(data.human_factor_data.columns))
+	cb_domains = CheckboxGroup(labels=list(data.domains_data.columns), active=get_active(data.domains_data.columns))
+	cb_goals = CheckboxGroup(labels=list(data.goals_data.columns), active=get_active(data.goals_data.columns))
+	cb_means = CheckboxGroup(labels=list(data.means_data.columns), active=get_active(data.means_data.columns))
+	cb_myapproach = CheckboxGroup(labels=list(data.my_approach_data.columns), active=get_active(data.my_approach_data.columns))
+	cb_contenttome = CheckboxGroup(labels=list(data.content_to_me_data.columns), active=get_active(data.content_to_me_data.columns))
 
 	# The names of the sub-catogory data instead of sources is the pandas df
 	sub_cat_names = data.human_factor_data.columns
@@ -171,7 +163,7 @@ def home():
 			all_sliders[sliders] = Slider(title=sliders, value=data.active[sliders][1], start=0, end=1, step=0.01)
 			all_sliders[sliders].visible = data.active[sliders][0] 
 
-	callback = CustomJS(args=dict(source=data_source, sliders=list(all_sliders.values()), image_height=data.image_height, image_width=data.image_width, per_row=data.per_row, rows=data.rows, images=data.images_length,y_range=data.y_range), code="""
+	callback = CustomJS(args=dict(source=data_source, sliders=list(all_sliders.values()), image_height=data.image_height, image_width=data.image_width, per_row=data.per_row, rows=data.rows, images=data.images_length), code="""
 		source_data = source["data"]
 		updateSliderValue(cb_obj.attributes.title, cb_obj.attributes.value)
 
@@ -185,44 +177,36 @@ def home():
 		// slider array names
 		const slider_idx_to_name = active_sliders.map(slider => slider['attributes']['title']);
 
-		const filter_amount = slider_idx_to_name.length
-		console.log(filter_amount)
+		// source data for all images
+		const source_vectors = slider_idx_to_name.map(name => source_data[name]);
 
-		if (filter_amount > 2){
-			var hover_name_1 = slider_idx_to_name.slice(0, 1);
-			var hover_name_2 = slider_idx_to_name.slice(1, 2);
-			var hover_name_3 = slider_idx_to_name.slice(2, 3);
+		// for each row of features subtract the slider value
+		const subtracted_feature_matrix = source_vectors.map(function(v, i) { return subtract(v,  slider_array[i])});
 
-			source["data"]['filter_1'] = source_data[hover_name_1]
-			source["data"]['filter_2'] = source_data[hover_name_2]
-			source["data"]['filter_3'] = source_data[hover_name_3]
-		}
+		var scores = new Array(images)
+		for (i = 0; i < images; i++) {
+			scores[i] = Math.abs(subtracted_feature_matrix.map(value => value[i]).reduce((a,b) => a+b, 0))
+		} 
 
-		if (filter_amount == 2){
-			var hover_name_1 = slider_idx_to_name.slice(0, 1);
-			var hover_name_2 = slider_idx_to_name.slice(1, 2);
+		indexedScores = scores.map(function(e,i){return {ind: i, val: e}});
+		// sort index/value couples, based on values
+		indexedScores.sort(function(x, y){return x.val > y.val ? 1 : x.val == y.val ? 0 : -1});
+		// make list keeping only indices
+		const rank = indexedScores.map(function(e){return e.ind + 1});
 
-			source["data"]['filter_1'] = source_data[hover_name_1]
-			source["data"]['filter_2'] = source_data[hover_name_2]
-			source["data"]['filter_3'] = source["data"]['empty']
-		}
+		source["data"]['rank'] = rank 
+		source["data"]["x1"] = rank
 
-		if (filter_amount == 1){
-			var hover_name_1 = slider_idx_to_name.slice(0, 1);
+		const x_range = per_row * image_width
+		const y_range = images / per_row * image_height
 
-			source["data"]['filter_1'] = source_data[hover_name_1]
-			source["data"]['filter_2'] = source["data"]['empty']
-			source["data"]['filter_3'] = source["data"]['empty']
-		}
-		
-		socket.on('rank_update', function(msg) {
-            source["data"]['rank'] = msg.rank;
-			source["data"]['x1'] = source["data"]['rank'].map(value => (value - 1) % per_row)
-			source["data"]['y1'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row))
-			source["data"]['x2'] = source["data"]['rank'].map(value => (value - 1) % per_row + image_width) 
-			source["data"]['y2'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height)
-			source.change.emit()
-        });
+		source["data"]['x1'] = source["data"]['rank'].map(value => (value - 1) % per_row)
+		source["data"]['y1'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row))
+		source["data"]['x2'] = source["data"]['rank'].map(value => (value - 1) % per_row + image_width) 
+		source["data"]['y2'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
+
+
+		source.change.emit()
 	"""	)
 
 	for slider in all_sliders.values():
@@ -269,6 +253,52 @@ def home():
 	
 		
 		"""
+	
+	
+	callback_hover = CustomJS(args=dict(source=data_source, sliders=list(all_sliders.values())), code="""
+		source_data = source["data"]
+		updateSliderValue(cb_obj.attributes.title, cb_obj.attributes.value)
+
+
+		const active_sliders = sliders.filter(slider => slider["attributes"]["visible"]);
+		// slider array names
+		const slider_idx_to_name = active_sliders.map(slider => slider['attributes']['title']);
+
+		const filter_amount = slider_idx_to_name.length
+		console.log(filter_amount)
+
+		if (filter_amount > 2){
+			var hover_name_1 = slider_idx_to_name.slice(0, 1);
+			var hover_name_2 = slider_idx_to_name.slice(1, 2);
+			var hover_name_3 = slider_idx_to_name.slice(2, 3);
+
+			source["data"]['filter_1'] = source_data[hover_name_1]
+			source["data"]['filter_2'] = source_data[hover_name_2]
+			source["data"]['filter_3'] = source_data[hover_name_3]
+		}
+
+		if (filter_amount == 2){
+			var hover_name_1 = slider_idx_to_name.slice(0, 1);
+			var hover_name_2 = slider_idx_to_name.slice(1, 2);
+
+			source["data"]['filter_1'] = source_data[hover_name_1]
+			source["data"]['filter_2'] = source_data[hover_name_2]
+			source["data"]['filter_3'] = source["data"]['empty']
+		}
+
+		if (filter_amount == 1){
+			var hover_name_1 = slider_idx_to_name.slice(0, 1);
+
+			source["data"]['filter_1'] = source_data[hover_name_1]
+			source["data"]['filter_2'] = source["data"]['empty']
+			source["data"]['filter_3'] = source["data"]['empty']
+		}
+		
+
+		source.change.emit()
+	"""	)
+
+	
 	# ColumnDataSource(data.active
 	# active_data = ColumnDataSource(data=data.active)
 	
@@ -280,6 +310,13 @@ def home():
 
 	for cb in cb_col:
 		cb.js_on_change("active", CustomJS(args=dict(slider=all_sliders), code=code_cb))
+
+	for cb in cb_col:
+		cb.js_on_change("active", callback_hover)
+
+	
+
+
 
 
 	# button_grid = column([btn_geography],[btn_reality],[btn_humanfactor],[btn_domains],[btn_goals], [btn_means], [btn_myapproach], [btn_contenttome])
