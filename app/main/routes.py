@@ -376,7 +376,7 @@ def view2(image_name):
 	p_sim.axis.visible = False
 	p_sim.xgrid.grid_line_color = None
 
-
+	
 	image_data_row = df[df['name']==image_name]
 
 	p = figure(x_range=(0,10), y_range=(0,10), plot_width=20, plot_height=20,toolbar_location=None)
@@ -394,7 +394,6 @@ def view2(image_name):
 	p.axis.visible = False
 	p.xgrid.grid_line_color = None
 
-	active_text = PreText(text="Active Filters",width=200, height=40)
 
 	btn_geography = Button(label="Geography", button_type="primary", width=150 )
 	btn_reality = Button(label="Reality", button_type="danger", width=150)
@@ -517,19 +516,41 @@ def view2(image_name):
 		slider.js_on_change('value', callback)
 
 
+
+	mytext = PreText(text="Labeling interface", style={'color': 'black', 'font-size':'20pt'})
+	mytext2 = PreText(text="Selected image: " + image_name, style={'color': 'black', 'font-size':'20pt', 'font-family': 'Arial, Helvetica, sans-serif'})
+	mytext3 = PreText(text="Similar images", style={'color': 'black', 'font-size':'20xpt', 'font-family': 'Arial, Helvetica, sans-serif'})
+
+	# # configure visual properties on a plot's title attribute
+	# p_sim.title.text = "Similar images"
+	# p_sim.title.align = "center"
+	# p_sim.title.text_color = "Black"
+	# p_sim.title.text_font_size = "25px"
+	# #p_sim.title.background_fill_color = "#aaaaee"
+
+	# p.title.text = image_name
+	# p.title.align = "center"
+	# p.title.text_color = "Black"
+	# p.title.text_font_size = "25px"
+
 	right_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, 
-	btn_goals, btn_means, btn_myapproach, btn_contenttome, active_text, *all_sliders.values()])
+	btn_goals, btn_means, btn_myapproach, btn_contenttome, *all_sliders.values()])
 
 
 	button_grid = column([btn_geography, btn_reality, btn_humanfactor, btn_domains, btn_goals, btn_means, btn_myapproach, btn_contenttome])
 
-	slider_grid= column([active_text, *list(all_sliders.values())])
+	slider_grid= column([*list(all_sliders.values())])
 	right_grid = layout([[button_grid,cb_grid],[slider_grid]])
 
-	slider_grid= column([active_text, *all_sliders.values()])
+	slider_grid= column([*all_sliders.values()])
 	# define the components: the javascript used and the div
 
-	grid = gridplot([[p, right_grid, p_sim]], plot_width=600, plot_height=600, toolbar_location = None, sizing_mode='scale_both')
+
+	#grid = gridplot([[s1, s2], [None, s3]], plot_width=250, plot_height=250)
+
+	
+
+	grid = gridplot([[mytext, mytext2, mytext3], [right_grid, p, p_sim]], plot_width=600, plot_height=600, toolbar_location = None, sizing_mode='scale_both')
 
 	# define the components: the javascript used and the div
 	l_square_script, l_square_div = components(grid)
