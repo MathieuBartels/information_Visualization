@@ -134,12 +134,13 @@ def update_slider_value_view2(slider, value, image_name):
         slider_values = np.array([active[slider][1] for slider in active_list])
 
         df.loc[df['name']==image_name[0], 'score'] = image_data[active_list].apply(lambda x: similarity(x, slider_values), raw=True, axis=1)
-        df.loc[df['name']==image_name[0], 'newrank'] = list(np.argsort(df['score'])).index(image_data.index[0]-1)
+        for rank, row in enumerate(np.argsort(df['score'])):
+            df['newrank'].iloc[row] = rank
 
     df['simscore'] = df[all_index_names].apply(lambda x: similarity(x, image_values), raw=True, axis=1)
     df.replace(np.nan, 0, regex=True)
     for rank, row in enumerate(np.argsort(df['simscore'])):
-        df['simrank'].iloc[row] = rank -1
+        df['simrank'].iloc[row] = rank
 
     return df['simrank']
 
