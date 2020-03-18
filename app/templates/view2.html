@@ -3,26 +3,11 @@
 {{script}}
 {% block body %}
 
-<!-- <div id="img" class="view2"></div>
-<h1>The second view of our site</h1>
-<img src="{{url_for('static', filename='230_works_1024x/13aeroplanes_1998.jpg')}}" alt="aeroplanes" width="500" height="333">
-<script type="text/javascript" src="../static/js/show_image.js" class="view2"></script> -->
-<!-- <script>document.write(5 + 6);</script> -->
-<!-- <script>
-    var img = new Image();
-    var div = document.getElementById('x');
-    
-    img.onload = function() {
-        div.appendChild(img);
-    };
-    
-    img.src = "../data/230_works_1024x/Access_2007.jpg"
-</script> -->
-<!-- <script type="text/javascript" src="../static/js/show_image.js"></script> -->
 
 <div id="view2" class="view2_2"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 <script type="text/javascript" charset="utf-8">
+    const image_name = '{{image_name|safe }}'
     var socket = io.connect('http://' + document.domain + ':' + location.port);
     // verify our websocket connection is established
     socket.on('connect', function() {
@@ -32,14 +17,57 @@
 		socket.emit('dataframe_update', {image_name: image_name, slider_name: slider_name, value:value});
 	}
     function updateVisible(names, values) {
-		  socket.emit('active_update_view2', {slider_names: names, values: values });
+        socket.emit('active_update_view2', {slider_names: names, values: values });
     }
     function updateSliderValue(slider, value, image_name) {
-		  socket.emit('slider_value_update_view2', {slider_name: slider, var: value, image_name: image_name});
+        socket.emit('slider_value_update_view2', {slider_name: slider, var: value, image_name: image_name});
+        var fetch_url = '/data?image_name=' + image_name;
+        fetch(fetch_url)
+            .then(function(response) { return response.json(); })
+            .then((data) => {
+                d3.select("#predictionText")
+                .remove();
+
+                const rank = data.rank;
+                const new_rank = data.new_rank
+                console.log(data)
+
+                var htmlText = 'This view alters the values for image <b>' + image_name + '</b> The rank using the previous filters was <b>' + rank + '</b>. Now because of the edits made in the data, the current rank of the image is <b>' + new_rank + '<b>.'
+                
+                d3.select("#prediction-container")
+                    .append("p")
+                    .attr("id", "predictionText")
+                    .attr("class", "txt")
+                    .html(htmlText);
+
+            });
     }
     
 </script>
 <center>
+<div class="mt-3" id="prediction-container"></div>
+
+<script>
+	var fetch_url = '/data?image_name=' + image_name;
+	fetch(fetch_url)
+		.then(function(response) { return response.json(); })
+		.then((data) => {
+			const rank = data.rank;
+            const new_rank = data.new_rank
+            console.log(data)
+			var htmlText = 'This view alters the values for image <b>' + image_name + '</b> The rank using the previous filters was <b>' + rank + '</b>'
+            
+
+			d3.select("#prediction-container")
+				.append("p")
+				.attr("id", "predictionText")
+				.attr("class", "txt")
+				.html(htmlText);
+
+
+        });
+</script>
+
 {{l_square_script|safe }} 
 {{l_square_div|safe }}
 

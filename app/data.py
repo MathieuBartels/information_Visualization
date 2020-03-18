@@ -70,10 +70,12 @@ content_to_me_data = df[['Desire', 'Greed', 'Competition', 'Illusion', 'Attracti
 slider_index_total = [geography_data.columns, reality_data.columns, human_factor_data.columns, domains_data.columns,goals_data.columns, means_data.columns,my_approach_data.columns, content_to_me_data.columns]
 
 active = {}
-active_list = []
+active_list = ['Control']
 for index in slider_index_total:
-    for sliders in index:
+    for sliders in index:    
         active[sliders] = [False, 0]
+        if sliders is 'Control':
+            active[sliders] = [True, 0.3]
 
 all_index_names = list(active.keys())
 

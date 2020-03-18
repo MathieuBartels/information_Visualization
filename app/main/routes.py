@@ -534,10 +534,16 @@ def view2(image_name):
 	# define the components: the javascript used and the div
 	l_square_script, l_square_div = components(grid)
 	
-	return render_template('view2.html', images=data.images, data=data, l_square_script=l_square_script, l_square_div=l_square_div)
+	return render_template('view2.html', images=data.images, data=data, l_square_script=l_square_script, l_square_div=l_square_div, image_name=image_name)
 
 @main.route('/favicon.ico')
 def favicon():
 	return send_from_directory(os.path.join(main.root_path, 'static'),
 										'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+
+@main.route("/data", methods=['GET'])
+def get_data():
+	image_name = request.args.get("image_name")
+	image_data = data.df[data.df['name'] == image_name][['rank', 'newrank']].to_numpy().tolist()[0]
+	return jsonify(rank=image_data[0], new_rank=image_data[1])
