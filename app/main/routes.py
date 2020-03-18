@@ -257,9 +257,6 @@ def home():
 	
 	callback_hover = CustomJS(args=dict(source=data_source, sliders=list(all_sliders.values())), code="""
 		source_data = source["data"]
-		updateSliderValue(cb_obj.attributes.title, cb_obj.attributes.value)
-
-
 		const active_sliders = sliders.filter(slider => slider["attributes"]["visible"]);
 		// slider array names
 		const slider_idx_to_name = active_sliders.map(slider => slider['attributes']['title']);

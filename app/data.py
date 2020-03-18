@@ -19,7 +19,7 @@ df.rename(columns={'1= very related': 'name'}, inplace=True)
 df.columns.values[1] = "year"	
 df["year"] = df["year"].astype('int32')
 df.sort_values(by=['name'], inplace=True)
-
+df.index =sorted(df.index)
 
 for name in df:
     if name not in ['year', 'name']:
@@ -136,7 +136,7 @@ def update_slider_value_view2(slider, value, image_name):
         slider_values = np.array([active[slider][1] for slider in active_list])
 
         df.loc[df['name']==image_name[0], 'score'] = image_data[active_list].apply(lambda x: similarity(x, slider_values), raw=True, axis=1)
-        df.loc[df['name']==image_name[0], 'newrank'] = list(np.argsort(df['score'])).index(image_data.index[0])
+        df.loc[df['name']==image_name[0], 'newrank'] = list(np.argsort(df['score'])).index(image_data.index[0]-1)
 
     df['simscore'] = df[all_index_names].apply(lambda x: similarity(x, image_values), raw=True, axis=1)
     df.replace(np.nan, 0, regex=True)
