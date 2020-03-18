@@ -327,6 +327,8 @@ def view2(image_name):
 	
 	df = data.df
 
+	image_data_row = df[df['name']==image_name]
+
 	num_of_sim_images = 25
 
 	per_row = 5
@@ -334,11 +336,15 @@ def view2(image_name):
 	x_range = per_row * data.image_width
 	y_range = num_of_sim_images / per_row * data.image_height
 
-	df['simrank'] = df['rank']
-	df['sim_x1'] = (df['rank'] - 1) % per_row
-	df['sim_y1'] = y_range - (df['rank'] - 1) // per_row
-	df['sim_x2'] = (df['rank'] - 1) % per_row + data.image_width
-	df['sim_y2'] = y_range - (df['rank'] - 1) // per_row - data.image_height
+	df['simscore'] = df[data.all_index_names].apply(lambda x: data.similarity(x, image_data_row[data.all_index_names].to_numpy()), raw=True, axis=1)
+	df.replace(np.nan, 0, regex=True)
+	for rank, row in enumerate(np.argsort(df['simscore'])):
+		df['simrank'].iloc[row] = rank
+
+	df['sim_x1'] = (df['simrank'] - 1) % per_row
+	df['sim_y1'] = y_range - (df['simrank'] - 1) // per_row
+	df['sim_x2'] = (df['simrank'] - 1) % per_row + data.image_width
+	df['sim_y2'] = y_range - (df['simrank'] - 1) // per_row - data.image_height
 
 
 	data_source = ColumnDataSource(data=df)
@@ -353,8 +359,6 @@ def view2(image_name):
 	p_sim.xgrid.grid_line_color = None
 
 	
-	image_data_row = df[df['name']==image_name]
-
 	p = figure(x_range=(0,10), y_range=(0,10), plot_width=20, plot_height=20,toolbar_location=None)
 	p.image_url(url=image_data_row['urls'], x=2.5, y=8, w=5, h=5)
 	
