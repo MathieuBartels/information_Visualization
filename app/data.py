@@ -34,8 +34,6 @@ images = images[0:len(df)]
 urls = [f"/static/230_works_1024x/{name.replace(' ', '_')}_{year}.jpg" for (name, year) in zip(df['name'], df['year'])]
 df['urls'] = urls
 
-# print(urls)
-
 df = df[[os.path.exists(f"app/static/230_works_1024x/{name.replace(' ', '_')}_{year}.jpg") for (name, year) in zip(df['name'], df['year'])]]
 images_length = len(df)
 df['rank'] = df['simrank'] = range(1, images_length+1)

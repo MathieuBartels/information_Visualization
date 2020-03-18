@@ -163,47 +163,19 @@ def home():
 			all_sliders[sliders] = Slider(title=sliders, value=data.active[sliders][1], start=0, end=1, step=0.01)
 			all_sliders[sliders].visible = data.active[sliders][0] 
 
-	callback = CustomJS(args=dict(source=data_source, sliders=list(all_sliders.values()), image_height=data.image_height, image_width=data.image_width, per_row=data.per_row, rows=data.rows, images=data.images_length), code="""
-		source_data = source["data"]
+	callback = CustomJS(args=dict(source=data_source, sliders=list(all_sliders.values()), image_height=data.image_height, image_width=data.image_width, per_row=data.per_row, rows=data.rows, images=data.images_length, y_range=data.y_range), code="""
 		updateSliderValue(cb_obj.attributes.title, cb_obj.attributes.value)
+		socket.on('rank_update', function(msg) {
+            source["data"]['rank'] = msg.rank;
+			source["data"]['x1'] = source["data"]['rank'].map(value => (value - 1) % per_row)
+			source["data"]['y1'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row))
+			source["data"]['x2'] = source["data"]['rank'].map(value => (value - 1) % per_row + image_width) 
+			source["data"]['y2'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
 
-		// subtraction function where we subtract a value from an array
-		const subtract = function(array, value) {return array.map( array_at_i => array_at_i -value)}
+			source.change.emit()
+			}
+		);
 
-		// slider array values
-		//console.log(sliders);
-		const active_sliders = sliders.filter(slider => slider["attributes"]["visible"]);
-		const slider_array = active_sliders.map(slider => slider['properties']['value']['spec']['value'] );
-		// slider array names
-		const slider_idx_to_name = active_sliders.map(slider => slider['attributes']['title']);
-
-		// source data for all images
-		const source_vectors = slider_idx_to_name.map(name => source_data[name]);
-
-		// for each row of features subtract the slider value
-		const subtracted_feature_matrix = source_vectors.map(function(v, i) { return subtract(v,  slider_array[i])});
-
-		var scores = new Array(images)
-		for (i = 0; i < images; i++) {
-			scores[i] = Math.abs(subtracted_feature_matrix.map(value => value[i]).reduce((a,b) => a+b, 0))
-		} 
-
-		indexedScores = scores.map(function(e,i){return {ind: i, val: e}});
-		// sort index/value couples, based on values
-		indexedScores.sort(function(x, y){return x.val > y.val ? 1 : x.val == y.val ? 0 : -1});
-		// make list keeping only indices
-		const rank = indexedScores.map(function(e){return e.ind + 1});
-
-		source["data"]['rank'] = rank 
-		source["data"]["x1"] = rank
-
-		const x_range = per_row * image_width
-		const y_range = images / per_row * image_height
-
-		source["data"]['x1'] = source["data"]['rank'].map(value => (value - 1) % per_row)
-		source["data"]['y1'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row))
-		source["data"]['x2'] = source["data"]['rank'].map(value => (value - 1) % per_row + image_width) 
-		source["data"]['y2'] = source["data"]['rank'].map(value => y_range - Math.floor((value - 1) / per_row) - image_height) 
 
 
 		source.change.emit()
