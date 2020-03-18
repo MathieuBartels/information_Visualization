@@ -68,12 +68,10 @@ content_to_me_data = df[['Desire', 'Greed', 'Competition', 'Illusion', 'Attracti
 slider_index_total = [geography_data.columns, reality_data.columns, human_factor_data.columns, domains_data.columns,goals_data.columns, means_data.columns,my_approach_data.columns, content_to_me_data.columns]
 
 active = {}
-active_list = ['Control']
+active_list = []
 for index in slider_index_total:
     for sliders in index:    
         active[sliders] = [False, 0]
-        if sliders is 'Control':
-            active[sliders] = [True, 0.3]
 
 all_index_names = list(active.keys())
 
@@ -111,7 +109,7 @@ def update_slider_value(slider, value):
     df['score'] = df[active_list].apply(lambda x: similarity(x, slider_values), raw=True, axis=1)
     df.replace(np.nan, 0, regex=True)
     for rank, row in enumerate(np.argsort(df['score'])):
-        df['rank'].iloc[row] = rank
+        df['rank'].iloc[row] = rank + 1
 
     return df['rank']
 
@@ -135,7 +133,7 @@ def update_slider_value_view2(slider, value, image_name):
 
         df.loc[df['name']==image_name[0], 'score'] = image_data[active_list].apply(lambda x: similarity(x, slider_values), raw=True, axis=1)
         for rank, row in enumerate(np.argsort(df['score'])):
-            df['newrank'].iloc[row] = rank
+            df['newrank'].iloc[row] = rank + 1
 
     df['simscore'] = df[all_index_names].apply(lambda x: similarity(x, image_values), raw=True, axis=1)
     df.replace(np.nan, 0, regex=True)

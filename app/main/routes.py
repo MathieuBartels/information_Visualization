@@ -27,10 +27,17 @@ import math
 def home():
 	df = data.df
 
-	df['filter_1'] = ""
-	df['filter_2'] = ""
-	df['filter_3'] = ""
+	active_sliders_list = len(data.active_list)
+	df['filter_1'] = df[data.active_list[-1]] if active_sliders_list > 0 else ""
+	df['filter_2'] = df[data.active_list[-2]] if active_sliders_list > 1 else ""
+	df['filter_3'] = df[data.active_list[-3]] if active_sliders_list > 2 else ""
 	df['empty'] = ""
+
+	df['rank'] = df['newrank']
+	df['x1'] = (df['rank'] - 1) % data.per_row
+	df['y1'] = data.y_range - (df['rank'] - 1) // data.per_row
+	df['x2'] = (df['rank'] - 1) % data.per_row + data.image_width
+	df['y2'] = data.y_range - (df['rank'] - 1) // data.per_row - data.image_height
 	
 	data_source = ColumnDataSource(data=df)
 
