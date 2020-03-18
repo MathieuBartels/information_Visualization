@@ -43,7 +43,7 @@ def home():
 	]
 
 
-	p = figure(x_range=(0, data.x_range), y_range=(0, data.y_range), plot_width=1000, plot_height=4000, tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
+	p = figure(x_range=(0, data.x_range), y_range=(0, data.y_range), plot_width=800, plot_height=4000, tools='hover, wheel_zoom', tooltips=TOOLTIPS, toolbar_location=None)
 	p.image_url(url='urls', x='x1', y='y1', w='w', h='h', source=data_source)
 
 	p.quad(top='y1', bottom= 'y2', left='x1', right='x2', source=data_source, alpha=0)
@@ -529,7 +529,7 @@ def view2(image_name):
 	slider_grid= column([active_text, *all_sliders.values()])
 	# define the components: the javascript used and the div
 
-	grid = gridplot([[p, right_grid],[p_sim]], plot_width=600, plot_height=600, toolbar_location = None, sizing_mode='scale_both')
+	grid = gridplot([[p, right_grid, p_sim]], plot_width=600, plot_height=600, toolbar_location = None, sizing_mode='scale_both')
 
 	# define the components: the javascript used and the div
 	l_square_script, l_square_div = components(grid)
